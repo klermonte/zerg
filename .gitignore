@@ -1,0 +1,4 @@
+.idea
+*.phar
+*.lock
+vendor
