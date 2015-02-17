@@ -8,7 +8,7 @@ class Raw extends AbstractField
 {
     public function read(AbstractStream $stream)
     {
-        return $stream->read($this->getLength());
+        return $this->format($stream->read($this->getLength()));
     }
 
     /**

@@ -28,7 +28,7 @@ class String extends AbstractField
 
         }
 
-        return $string;
+        return $this->format($string);
     }
 
     private function isUtf()

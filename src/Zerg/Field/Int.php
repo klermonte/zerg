@@ -22,7 +22,7 @@ class Int extends AbstractField
             throw new \Exception('Integer longer 8 bits not implemented yet');
         }
 
-        return $value;
+        return $this->format($value);
     }
 
     public function isSigned()

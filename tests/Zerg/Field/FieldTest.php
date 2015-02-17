@@ -3,6 +3,7 @@
 namespace Zerg\Field;
 
 use Zerg\DataSet;
+use Zerg\Stream\StringStream;
 
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -88,5 +89,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(32, $field2->getLength());
         $field2->setLength('/c');
         $this->assertEquals(16, $field2->getLength());
+    }
+
+    /**
+     * @covers Zerg\Field\AbstractField::format
+     * */
+    public function testValueCallback()
+    {
+        $stream = new StringStream('123abcdefgqwertyahnytjssdadfkjhb');
+        $field = new Int('byte', [
+            'valueCallback' => function($value) {
+                return $value - 2 * 8;
+            }
+        ]);
+
+        $this->assertEquals(33, $field->read($stream));
+
     }
 }

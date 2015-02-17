@@ -136,6 +136,17 @@ abstract class AbstractField
         return $length;
     }
 
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    public function format($value)
+    {
+        if (isset($this->params['valueCallback']) && $this->params['valueCallback'] instanceof \Closure) {
+            $value = $this->params['valueCallback']($value);
+        }
+        return $value;
+    }
 
     /**
      * @param AbstractStream $stream
