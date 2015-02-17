@@ -103,7 +103,7 @@ abstract class AbstractField
         $length = (int) $this->length;
 
         if (isset($this->params['lengthCallback']) && $this->params['lengthCallback'] instanceof \Closure) {
-            $length = (int) $this->params['lengthCallback']($this->length);
+            $length = (int) $this->params['lengthCallback']($length);
         }
 
         if ($length < 0) {
