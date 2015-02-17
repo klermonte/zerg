@@ -4,6 +4,9 @@ namespace Zerg;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @covers Zerg\Parser::parse
+     * */
     public function testParse()
     {
         $stream = new Stream\StringStream('123abcdefgqwertyahnytjssdadfkjhb');
