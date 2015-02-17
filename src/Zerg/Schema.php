@@ -69,16 +69,9 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Whether a offset exists
-     * @link http://php.net/manual/en/arrayaccess.offsetexists.php
-     * @param mixed $offset <p>
-     * An offset to check for.
-     * </p>
-     * @return boolean true on success or false on failure.
-     * </p>
-     * <p>
-     * The return value will be casted to boolean if non-boolean was returned.
+     * @param mixed $offset An offset to check for
+     * @return boolean true on success or false on failure
      */
     public function offsetExists($offset)
     {
@@ -86,13 +79,9 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to retrieve
-     * @link http://php.net/manual/en/arrayaccess.offsetget.php
-     * @param mixed $offset <p>
-     * The offset to retrieve.
-     * </p>
-     * @return mixed Can return all value types.
+     * Return field instance by given offset
+     * @param mixed $offset The offset to retrieve
+     * @return Field\AbstractField | Schema
      */
     public function offsetGet($offset)
     {
@@ -100,15 +89,9 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to set
-     * @link http://php.net/manual/en/arrayaccess.offsetset.php
-     * @param mixed $offset <p>
-     * The offset to assign the value to.
-     * </p>
-     * @param mixed $value <p>
-     * The value to set.
-     * </p>
+     * add field or sub schema by given offset
+     * @param mixed $offset The offset to assign the value to.
+     * @param Field\AbstractField | Schema $value The value to set
      * @return void
      */
     public function offsetSet($offset, $value)
@@ -117,12 +100,8 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
-     * Offset to unset
-     * @link http://php.net/manual/en/arrayaccess.offsetunset.php
-     * @param mixed $offset <p>
-     * The offset to unset.
-     * </p>
+     * Unset field by offset
+     * @param mixed $offset The offset to unset
      * @return void
      */
     public function offsetUnset($offset)
@@ -131,10 +110,8 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return Field\AbstractField | Schema
      */
     public function current()
     {
@@ -142,9 +119,7 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      */
     public function next()
@@ -153,9 +128,7 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      */
     public function key()
@@ -164,9 +137,7 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
      * @return boolean The return value will be casted to boolean and then evaluated.
      * Returns true on success or false on failure.
      */
@@ -176,9 +147,7 @@ class Schema implements \ArrayAccess, \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.0.0)<br/>
      * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      */
     public function rewind()
