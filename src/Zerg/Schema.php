@@ -44,10 +44,6 @@ class Schema implements \ArrayAccess, \Iterator
             $paramsKeys = array_keys($fieldParams);
             $fieldType = reset($fieldParams);
 
-            if (!$fieldType) {
-                continue;
-            }
-
             if (array_keys($paramsKeys) !== $paramsKeys || is_array($fieldType)) {
 
                 // $paramsKeys is associative - recursively generate sub array
