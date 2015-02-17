@@ -55,7 +55,7 @@ class DataSet
             if (isset($child[$part])) {
                 $child = & $child[$part];
             } else {
-                $child[$part] = array();
+                $child[$part] = [];
                 $child = & $child[$part];
             }
         }
@@ -129,7 +129,7 @@ class DataSet
             if (isset($child[$part])) {
                 $child = & $child[$part];
             } else {
-                $child[$part] = array();
+                $child[$part] = [];
                 $child = & $child[$part];
             }
         }

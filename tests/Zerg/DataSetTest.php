@@ -46,7 +46,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
     {
         $dataSet = new DataSet();
         $dataSet->setValue('foo', 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(array('foo'), true));
+        $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
     }
     
     /**
@@ -55,8 +55,8 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
     public function testFlatSetValueByPath()
     {
         $dataSet = new DataSet();
-        $dataSet->setValueByPath(array('foo'), 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(array('foo'), true));
+        $dataSet->setValueByPath(['foo'], 'bar');
+        $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
     }
     
     /**
@@ -67,11 +67,11 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet = new DataSet();
         $dataSet->push('level1');
         $dataSet->setValue('foo', 'bar');
-        $this->assertEquals(array(
-            'level1' => array(
+        $this->assertEquals([
+            'level1' => [
                 'foo' => 'bar'
-            )
-        ), $dataSet->getData());
+            ]
+        ], $dataSet->getData());
     }
     
     /**
@@ -93,7 +93,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet = new DataSet();
         $dataSet->push('level1');
         $dataSet->setValue('foo', 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(array('level1', 'foo'), true));
+        $this->assertEquals('bar', $dataSet->getValueByPath(['level1', 'foo'], true));
     }
     
     /**
@@ -102,7 +102,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
     public function testNestedSetValueByPath()
     {
         $dataSet = new DataSet();
-        $dataSet->setValueByPath(array('level1', 'foo'), 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(array('level1', 'foo'), true));
+        $dataSet->setValueByPath(['level1', 'foo'], 'bar');
+        $this->assertEquals('bar', $dataSet->getValueByPath(['level1', 'foo'], true));
     }
 }
