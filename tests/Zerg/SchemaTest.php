@@ -74,7 +74,7 @@ class SchemaTest extends \PHPUnit_Framework_TestCase
             'c' => [
                 'd' => ['int', 8, ['signed' => true]]
             ],
-            'e' => ['string', 10, ['multiply' => 16]]
+            'e' => ['string', 10, ['count' => 16]]
         ]);
 
         $this->assertInstanceOf('\\Zerg\\Field\\Int', $schema['a']);

@@ -14,10 +14,10 @@ class Factory
         $return = null;
 
         $fieldOptions = isset($fieldParams[2]) ? $fieldParams[2] : [];
-        if (isset($fieldOptions['multiply'])) {
+        if (isset($fieldOptions['count'])) {
 
-            $count = (int)$fieldOptions['multiply'];
-            unset($fieldParams[2]['multiply']);
+            $count = (int)$fieldOptions['count'];
+            unset($fieldParams[2]['count']);
 
             $return = [];
             for ($i = 0; $i < $count; $i++) {
