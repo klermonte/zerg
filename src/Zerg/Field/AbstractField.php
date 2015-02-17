@@ -100,11 +100,17 @@ abstract class AbstractField
             }
         }
 
-        if ($this->length < 0) {
+        $length = (int) $this->length;
+
+        if (isset($this->params['lengthCallback']) && $this->params['lengthCallback'] instanceof \Closure) {
+            $length = (int) $this->params['lengthCallback']($this->length);
+        }
+
+        if ($length < 0) {
             throw new \Exception('Field length should not be less 0');
         }
 
-        return (int) $this->length;
+        return $length;
     }
 
     /**
