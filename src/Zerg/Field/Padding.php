@@ -2,13 +2,24 @@
 
 namespace Zerg\Field;
 
+use Zerg\Schema\SchemaElement;
+use Zerg\Schema\Sizeable;
+use Zerg\Schema\SizeableTrait;
 use Zerg\Stream\AbstractStream;
 
-class Padding extends AbstractField
+class Padding extends SchemaElement implements Sizeable
 {
-    public function read(AbstractStream $stream)
+    use SizeableTrait;
+
+    public function __construct($size, $properties = [])
     {
-        $stream->skip($this->getLength());
+        $this->setSize($size);
+        $this->configure($properties);
+    }
+
+    public function parse(AbstractStream $stream)
+    {
+        $stream->skip($this->getSize());
         return null;
     }
 

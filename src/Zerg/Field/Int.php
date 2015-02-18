@@ -4,30 +4,27 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
-class Int extends AbstractField
+class Int extends Scalar
 {
+    protected $signed;
+
     public function read(AbstractStream $stream)
     {
-        $length = $this->getLength();
+        $size = $this->getSize();
 
-        $raw = $stream->read($length);
+        $raw = $stream->read($size);
 
         $value = null;
 
-        if ($length <= 8) {
-            $value = $this->isSigned()
+        if ($size <= 8) {
+            $value = $this->signed
                 ? $this->int8($raw)
                 : $this->uInt8($raw);
         } else {
             throw new \Exception('Integer longer 8 bits not implemented yet');
         }
 
-        return $this->format($value);
-    }
-
-    public function isSigned()
-    {
-        return !empty($this->params['signed']);
+        return $value;
     }
 
     private function int8($data)

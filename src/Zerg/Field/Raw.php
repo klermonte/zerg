@@ -4,11 +4,11 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
-class Raw extends AbstractField
+class Raw extends Scalar
 {
     public function read(AbstractStream $stream)
     {
-        return $this->format($stream->read($this->getLength()));
+        return $stream->read($this->getLength());
     }
 
     /**

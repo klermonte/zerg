@@ -4,11 +4,17 @@ namespace Zerg\Field;
 
 use Zerg\DataSet;
 use Zerg\Schema;
+use Zerg\Schema\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
-class Conditional extends AbstractField
+class Conditional extends SchemaElement
 {
     private $path = [];
+
+    public function __construct($path, $properties = [])
+    {
+
+    }
 
     public function setMainParam($keyPath)
     {
@@ -17,10 +23,10 @@ class Conditional extends AbstractField
 
     /**
      * @param AbstractStream $stream
-     * @return AbstractField|Schema
+     * @return SchemaElement
      * @throws \Exception
      */
-    public function read(AbstractStream $stream)
+    public function parse(AbstractStream $stream)
     {
         $key = $this->getSchemaKey();
 

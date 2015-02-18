@@ -4,13 +4,15 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
-class String extends AbstractField
+class String extends Scalar
 {
+    protected $utf;
+
     public function read(AbstractStream $stream)
     {
         $string = rtrim($stream->read($this->getLength() * 8));
 
-        if ($this->isUtf()) {
+        if ($this->utf) {
 
             if (strlen($string) < 2)
                 return '';
@@ -29,11 +31,6 @@ class String extends AbstractField
         }
 
         return $this->format($string);
-    }
-
-    private function isUtf()
-    {
-        return !empty($this->params['utf']);
     }
 
     /**
