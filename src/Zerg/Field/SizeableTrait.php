@@ -1,7 +1,12 @@
 <?php
 
-namespace Zerg\Schema;
+namespace Zerg\Field;
 
+use Zerg\DataSet;
+
+/**
+ * @property \Zerg\Schema $parent
+ * */
 trait SizeableTrait 
 {
     private $sizes = [
@@ -31,13 +36,12 @@ trait SizeableTrait
 
             } elseif (strpos($this->size, '/') !== false) {
 
-                /*if ($this->dataSet instanceof DataSet) {
-                    $path = explode('/', trim($this->size, '/'));
-                    $this->size = $this->dataSet->getValueByPath($path);
+                if (($dataSet = $this->parent->getDataSet()) instanceof DataSet) {
+                    $this->size = $dataSet->getValueByPath($this->size);
                     return $this->getSize();
                 } else {
                     throw new \Exception('Dataset required to get value by path');
-                }*/
+                }
             } else {
                 throw new \Exception("'{$this->size}' is not valid size value");
             }

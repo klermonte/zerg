@@ -10,7 +10,7 @@ class String extends Scalar
 
     public function read(AbstractStream $stream)
     {
-        $string = rtrim($stream->read($this->getLength() * 8));
+        $string = rtrim($stream->read($this->getSize() * 8));
 
         if ($this->utf) {
 

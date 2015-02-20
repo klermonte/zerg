@@ -1,28 +1,30 @@
 <?php
 
-namespace Zerg\Schema;
+namespace Zerg;
 
-use Zerg\DataSet;
+use Zerg\Field\Countable;
 use Zerg\Stream\AbstractStream;
 
-class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Countable
+class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Countable
 {
-    use CountableTrait;
+    use Field\CountableTrait;
 
     /**
      * @var DataSet
      */
-    protected $dataSet;
+    private $dataSet;
 
     /**
      * @var SchemaElement[]
      */
     private $elements = [];
 
+    private $schemaArray = [];
+
     public function __construct($schemaArray = [], $properties = [])
     {
-        $this->elements = $this->initFromArray($schemaArray);
         $this->dataSet = new DataSet;
+        $this->initFromArray($schemaArray);
         $this->configure($properties);
     }
 
@@ -40,13 +42,28 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Countable
     }
 
     /**
+     * @return DataSet
+     */
+    public function getDataSet()
+    {
+        return $this->dataSet;
+    }
+
+    /**
+     * @param $dataSet
+     */
+    public function setDataSet($dataSet)
+    {
+        $this->dataSet = $dataSet;
+    }
+
+    /**
      * @param array $array
-     * @return array
      * @throws \Exception
      */
     private function initFromArray($array = [])
     {
-        $elements = [];
+        $this->schemaArray = $array;
         foreach ($array as $elementName => $elementParams) {
 
             if (!is_array($elementParams)) {
@@ -59,26 +76,60 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Countable
                 $elementParams = ['schema', $elementParams];
             }
 
-            $element = Factory::get($elementParams);
+            $element = Field\Factory::get($elementParams);
 
             $element->setParent($this);
-            $elements[$elementName] = $element;
+            $this->elements[$elementName] = $element;
         }
-
-        return $elements;
     }
 
     public function parse(AbstractStream $stream)
     {
+        $currentDataSet = $this->dataSet;
+
         foreach ($this->elements as $elementName => $element) {
-            $this->dataSet->setValue($elementName, $element->parse($stream));
+
+            if ($element instanceof self) {
+
+                $childDataSet = $element->dataSet;
+                $currentDataSet[$elementName] = $childDataSet;
+                $element->clear();
+
+                if ($element->getCount() > 1) {
+                    for ($i = 0; $i < $element->getCount(); $i++) {
+                        $childDataSet[$i] = $element->parse($stream);
+                    }
+                } else {
+                    $element->parse($stream);
+                }
+
+            } else {
+                $value = $element->parse($stream);
+                if ($value !== null) {
+                    $currentDataSet[$elementName] = $value;
+                }
+            }
         }
-        return $this->dataSet;
+
+        return $currentDataSet;
     }
 
     public function write(AbstractStream $stream, $value)
     {
         // TODO: Implement write() method.
+    }
+
+    public function clear()
+    {
+        $dataSet = new DataSet;
+        $dataSet->setParent($this->getParent()->getDataSet());
+        $this->setDataSet($dataSet);
+
+        foreach ($this->elements as $element) {
+            if ($element instanceof self) {
+                $element->clear();
+            }
+        }
     }
 
     /**

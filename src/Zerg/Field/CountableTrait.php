@@ -1,29 +1,32 @@
 <?php
 
-namespace Zerg\Schema;
+namespace Zerg\Field;
+use Zerg\DataSet;
 
+/**
+ * @property \Zerg\Schema parent
+ * */
 trait CountableTrait
 {
-    protected $count;
+    protected $count = 1;
     protected $countCallback;
 
-    public function getCount()
+    public function setCount($count)
     {
-        return $this->count;
+        $this->count = $count;
     }
 
-    public function setCount($count)
+    public function getCount()
     {
         if (!is_numeric($this->count)) {
             if (strpos($this->count, '/') !== false) {
 
-                /*if ($this->dataSet instanceof DataSet) {
-                    $path = explode('/', trim($this->size, '/'));
-                    $this->size = $this->dataSet->getValueByPath($path);
-                    return $this->getSize();
+                if (($dataSet = $this->parent->getDataSet()) instanceof DataSet) {
+                    $this->count = $dataSet->getValueByPath($this->count);
+                    return $this->getCount();
                 } else {
                     throw new \Exception('Dataset required to get value by path');
-                }*/
+                }
             } else {
                 throw new \Exception("'{$this->count}' is not valid count value");
             }

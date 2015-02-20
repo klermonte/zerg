@@ -1,6 +1,6 @@
 <?php
 
-namespace Zerg\Schema;
+namespace Zerg\Field;
 
 interface Sizeable
 {

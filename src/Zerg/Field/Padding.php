@@ -2,9 +2,7 @@
 
 namespace Zerg\Field;
 
-use Zerg\Schema\SchemaElement;
-use Zerg\Schema\Sizeable;
-use Zerg\Schema\SizeableTrait;
+use Zerg\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
 class Padding extends SchemaElement implements Sizeable

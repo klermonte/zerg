@@ -95,7 +95,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet->setValue('foo', 'bar');
         $this->assertEquals('bar', $dataSet->getValueByPath(['level1', 'foo'], true));
     }
-    
+
     /**
      * @covers Zerg\DataSet::setValueByPath
      */

@@ -5,48 +5,23 @@ namespace Zerg\Field;
 class Factory
 {
     /**
-     * @param $fieldParams
-     * @return array|AbstractField
+     * @param array $elementParams
+     * @return \Zerg\SchemaElement
      * @throws \Exception
      */
-    static public function get($fieldParams)
+    public static function get($elementParams = [])
     {
-        $return = null;
+        $elementType = array_shift($elementParams);
 
-        $fieldOptions = isset($fieldParams[2]) ? $fieldParams[2] : [];
-        if (isset($fieldOptions['count'])) {
-
-            $count = (int)$fieldOptions['count'];
-            unset($fieldParams[2]['count']);
-
-            $return = [];
-            for ($i = 0; $i < $count; $i++) {
-                $return[] = self::get($fieldParams);
+        $nameSpaces = ['Field\\', ''];
+        foreach ($nameSpaces as $nameSpace) {
+            $class = "\\Zerg\\{$nameSpace}" . ucfirst(strtolower($elementType));
+            if (class_exists($class)) {
+                return new $class(array_shift($elementParams), array_shift($elementParams));
             }
-
-        } else {
-
-            $return = self::getInstance($fieldParams[0]);
-            $return->setMainParam($fieldParams[1]);
-            $return->setParams($fieldOptions);
-
         }
 
-        return $return;
-    }
+        throw new \Exception("Field {$elementType} doesn't exist");
 
-    /**
-     * @param $fieldType
-     * @return AbstractField field object
-     * @throws \Exception if $fieldType does not exist
-     */
-    static public function getInstance($fieldType)
-    {
-        $class = '\\Zerg\\Field\\' . ucfirst(strtolower($fieldType));
-        if (class_exists($class)) {
-            return new $class;
-        } else {
-            throw new \Exception("Field class {$class} doesn't exist");
-        }
     }
-} 
+}

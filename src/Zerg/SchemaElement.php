@@ -1,16 +1,20 @@
 <?php
 
-namespace Zerg\Schema;
+namespace Zerg;
 
 use Zerg\Stream\AbstractStream;
 
 abstract class SchemaElement
 {
+    /**
+     * @var Schema
+     * */
     protected $parent;
 
     abstract public function __construct($mainParam, $properties = []);
 
     abstract public function parse(AbstractStream $stream);
+
     abstract public function write(AbstractStream $stream, $value);
 
     public function configure($properties = [])
@@ -21,7 +25,7 @@ abstract class SchemaElement
     }
 
     /**
-     * @return mixed
+     * @return Schema
      */
     public function getParent()
     {
@@ -29,9 +33,9 @@ abstract class SchemaElement
     }
 
     /**
-     * @param mixed $parent
+     * @param Schema $parent
      */
-    public function setParent($parent)
+    public function setParent(Schema $parent)
     {
         $this->parent = $parent;
     }
