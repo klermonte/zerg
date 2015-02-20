@@ -6,7 +6,7 @@ use Zerg\DataSet;
 use Zerg\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
-abstract class Scalar extends SchemaElement implements Countable, Sizeable
+abstract class Scalar extends AbstractField implements Countable, Sizeable
 {
     use CountableTrait;
     use SizeableTrait;
@@ -23,22 +23,7 @@ abstract class Scalar extends SchemaElement implements Countable, Sizeable
 
     public function parse(AbstractStream $stream)
     {
-        if ($this->getCount() > 1) {
-
-            $arrayDataSet = new DataSet;
-            $arrayDataSet->setParent($this->getParent()->getDataSet());
-
-            for ($i = 0; $i < $this->getCount(); $i++) {
-                $arrayDataSet[$i] = $this->format($this->read($stream));
-            }
-
-            $result = $arrayDataSet;
-
-        } else {
-            $result = $this->format($this->read($stream));
-        }
-
-        return $result;
+        return $this->format($this->read($stream));
     }
 
     public function format($value)

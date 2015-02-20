@@ -3,9 +3,6 @@
 namespace Zerg\Field;
 use Zerg\DataSet;
 
-/**
- * @property \Zerg\Schema parent
- * */
 trait CountableTrait
 {
     protected $count = 1;
@@ -18,14 +15,16 @@ trait CountableTrait
 
     public function getCount()
     {
+        /**
+         * @var $this AbstractField | self
+         * */
         if (!is_numeric($this->count)) {
             if (strpos($this->count, '/') !== false) {
-
-                if (($dataSet = $this->parent->getDataSet()) instanceof DataSet) {
-                    $this->count = $dataSet->getValueByPath($this->count);
+                if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+                    $this->count = $dataSet->getValueByPath($dataSet->parsePath($this->count));
                     return $this->getCount();
                 } else {
-                    throw new \Exception('Dataset required to get value by path');
+                    throw new \Exception('DataSet required to get value by path');
                 }
             } else {
                 throw new \Exception("'{$this->count}' is not valid count value");

@@ -2,6 +2,7 @@
 
 namespace Zerg\Field;
 
+use Zerg\DataSet;
 use Zerg\Stream\AbstractStream;
 
 abstract class AbstractField
@@ -9,7 +10,12 @@ abstract class AbstractField
     /**
      * @var Collection
      * */
-    protected $parent;
+    protected $parent = null;
+
+    /**
+     * @var DataSet
+     */
+    protected $dataSet = null;
 
     abstract public function __construct($mainParam, $properties = []);
 
@@ -34,9 +40,31 @@ abstract class AbstractField
 
     /**
      * @param Collection $parent
+     * @return self
      */
     public function setParent(Collection $parent)
     {
         $this->parent = $parent;
+        return $this;
     }
+
+    /**
+     * @return DataSet
+     */
+    public function getDataSet()
+    {
+        return $this->dataSet;
+    }
+
+    /**
+     * @param DataSet $dataSet
+     * @return self
+     */
+    public function setDataSet(DataSet $dataSet)
+    {
+        $this->dataSet = $dataSet;
+        return $this;
+    }
+
+
 }

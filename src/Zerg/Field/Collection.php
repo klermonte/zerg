@@ -2,6 +2,7 @@
 
 namespace Zerg\Field;
 
+use Zerg\DataSet;
 use Zerg\Stream\AbstractStream;
 
 class Collection extends AbstractField implements \ArrayAccess, \Iterator, Countable
@@ -53,33 +54,60 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
 
     public function parse(AbstractStream $stream)
     {
-        $currentDataSet = $this->dataSet;
+        if (!$this->parent) {
+            $this->dataSet = new DataSet;
+        }
 
-        foreach ($this->child as $elementName => $element) {
+        $dataSet = $this->dataSet;
+        foreach ($this->children as $fieldName => $fieldObj) {
 
-            if ($element instanceof self) {
+            $fieldObj->setDataSet($dataSet);
 
-                $childDataSet = $element->dataSet;
-                $currentDataSet[$elementName] = $childDataSet;
-                $element->clear();
+            if ($fieldObj instanceof self) {
 
-                if ($element->getCount() > 1) {
-                    for ($i = 0; $i < $element->getCount(); $i++) {
-                        $childDataSet[$i] = $element->parse($stream);
+                $dataSet->push($fieldName);
+
+                if ($fieldObj->getCount() > 1) {
+
+                    for ($i = 0; $i < $fieldObj->getCount(); $i++) {
+                        $dataSet->push($i);
+                        $fieldObj->parse($stream);
+                        $dataSet->pop();
                     }
+
                 } else {
-                    $element->parse($stream);
+
+                    $fieldObj->parse($stream);
                 }
 
+                $dataSet->pop();
+
             } else {
-                $value = $element->parse($stream);
-                if ($value !== null) {
-                    $currentDataSet[$elementName] = $value;
+
+                if ($fieldObj instanceof Countable && $fieldObj->getCount() > 1) {
+
+                    /**
+                     * @var $fieldObj AbstractField | Countable
+                     * */
+
+                    $dataSet->push($fieldName);
+                    for ($i = 0; $i < $fieldObj->getCount(); $i++) {
+                        $dataSet->setValue($i, $fieldObj->parse($stream));
+                    }
+                    $dataSet->pop();
+
+                } else {
+
+                    $value = $fieldObj->parse($stream);
+                    if ($value !== null) {
+                        $dataSet->setValue($fieldName, $value);
+                    }
+
                 }
             }
         }
 
-        return $currentDataSet;
+        return $this->dataSet;
     }
 
     public function write(AbstractStream $stream, $value)
@@ -94,7 +122,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function offsetExists($offset)
     {
-        return isset($this->child[$offset]);
+        return isset($this->children[$offset]);
     }
 
     /**
@@ -104,7 +132,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function offsetGet($offset)
     {
-        return $this->child[$offset];
+        return $this->children[$offset];
     }
 
     /**
@@ -115,7 +143,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function offsetSet($offset, $value)
     {
-        $this->child[$offset] = $value;
+        $this->children[$offset] = $value;
     }
 
     /**
@@ -125,7 +153,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function offsetUnset($offset)
     {
-        unset($this->child[$offset]);
+        unset($this->children[$offset]);
     }
 
     /**
@@ -134,7 +162,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function current()
     {
-        return current($this->child);
+        return current($this->children);
     }
 
     /**
@@ -143,7 +171,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function next()
     {
-        next($this->child);
+        next($this->children);
     }
 
     /**
@@ -152,7 +180,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function key()
     {
-        return key($this->child);
+        return key($this->children);
     }
 
     /**
@@ -162,7 +190,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function valid()
     {
-        return isset($this->child[$this->key()]);
+        return isset($this->children[$this->key()]);
     }
 
     /**
@@ -171,6 +199,6 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
      */
     public function rewind()
     {
-        reset($this->child);
+        reset($this->children);
     }
 }

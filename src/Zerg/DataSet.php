@@ -138,5 +138,10 @@ class DataSet
         // TODO: $value into a single-element array
         $child[$endPart] = $value;
     }
+
+    public function parsePath($path)
+    {
+        return explode('/', trim($path, '/'));
+    }
 }
 

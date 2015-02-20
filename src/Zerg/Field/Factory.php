@@ -13,7 +13,7 @@ class Factory
     {
         $elementType = array_shift($elementParams);
 
-        $class = "\\Zerg\\Field" . ucfirst(strtolower($elementType));
+        $class = "\\Zerg\\Field\\" . ucfirst(strtolower($elementType));
         if (class_exists($class)) {
             return new $class(array_shift($elementParams), array_shift($elementParams));
         }

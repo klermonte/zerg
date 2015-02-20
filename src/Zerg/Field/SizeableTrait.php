@@ -4,9 +4,6 @@ namespace Zerg\Field;
 
 use Zerg\DataSet;
 
-/**
- * @property \Zerg\Schema $parent
- * */
 trait SizeableTrait 
 {
     private $sizes = [
@@ -24,23 +21,27 @@ trait SizeableTrait
     
     public function setSize($size)
     {
-        $this->size = $size;
+        if ($parsed = $this->parseSizeWord($this->size)) {
+            $this->size = $parsed;
+        } else {
+            $this->size = $size;
+        }
     }
 
     public function getSize()
     {
+        /**
+         * @var $this AbstractField | self
+         * */
+
         if (!is_numeric($this->size)) {
-            if ($parsed = $this->parseSizeWord($this->size)) {
-
-                $this->size = $parsed;
-
-            } elseif (strpos($this->size, '/') !== false) {
-
-                if (($dataSet = $this->parent->getDataSet()) instanceof DataSet) {
-                    $this->size = $dataSet->getValueByPath($this->size);
+            if (strpos($this->size, '/') !== false) {
+                if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+                    die('here');
+                    $this->size = $dataSet->getValueByPath($dataSet->parsePath($this->size));
                     return $this->getSize();
                 } else {
-                    throw new \Exception('Dataset required to get value by path');
+                    throw new \Exception('DataSet required to get value by path');
                 }
             } else {
                 throw new \Exception("'{$this->size}' is not valid size value");

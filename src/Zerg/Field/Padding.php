@@ -5,7 +5,7 @@ namespace Zerg\Field;
 use Zerg\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
-class Padding extends SchemaElement implements Sizeable
+class Padding extends AbstractField implements Sizeable
 {
     use SizeableTrait;
 
