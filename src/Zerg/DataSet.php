@@ -2,7 +2,7 @@
 
 namespace Zerg;
 
-class DataSet
+class DataSet implements \ArrayAccess, \Iterator
 {
     private $data = [];
     private $currentPath = [];
@@ -142,6 +142,52 @@ class DataSet
     public function parsePath($path)
     {
         return explode('/', trim($path, '/'));
+    }
+
+
+    public function current()
+    {
+        return current($this->data);
+    }
+
+    public function next()
+    {
+        next($this->data);
+    }
+
+    public function key()
+    {
+        return key($this->data);
+    }
+
+    public function valid()
+    {
+        return isset($this->data[$this->key()]);
+    }
+
+    public function rewind()
+    {
+        reset($this->data);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->data[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->data[$offset]);
     }
 }
 

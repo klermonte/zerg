@@ -9,8 +9,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetData()
     {
-        $dataSet = new DataSet(['a' => 'b']);
-        $data = $dataSet->getData();
+        $data = new DataSet(['a' => 'b']);
         $this->assertArrayHasKey('a', $data);
         $this->assertEquals('b', $data['a']);
         $this->assertCount(1, $data);
@@ -21,9 +20,8 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
      */
     public function testFlatSetValue()
     {
-        $dataSet = new DataSet();
-        $dataSet->setValue('foo', 'bar');
-        $data = $dataSet->getData();
+        $data = new DataSet();
+        $data->setValue('foo', 'bar');
         $this->assertArrayHasKey('foo', $data);
         $this->assertEquals('bar', $data['foo']);
         $this->assertCount(1, $data);
