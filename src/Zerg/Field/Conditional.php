@@ -3,68 +3,54 @@
 namespace Zerg\Field;
 
 use Zerg\DataSet;
-use Zerg\Schema;
-use Zerg\Schema\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
-class Conditional extends SchemaElement
+class Conditional extends AbstractField
 {
-    private $path = [];
+    private $path = '';
+
+    public $fields = [];
+    public $default = null;
 
     public function __construct($path, $properties = [])
     {
-
-    }
-
-    public function setMainParam($keyPath)
-    {
-        return $this->setPath($keyPath);
+        $this->path = $path;
+        $this->configure($properties);
     }
 
     /**
      * @param AbstractStream $stream
-     * @return SchemaElement
+     * @return AbstractField
      * @throws \Exception
      */
     public function parse(AbstractStream $stream)
     {
         $key = $this->getSchemaKey();
 
-        $schemas = $this->getSchemas();
-        $schema = null;
-        if (array_key_exists($key, $schemas))
-            $schema = $schemas[$key];
-        elseif ($this->getDefaultSchema() !== null)
-            $schema = $this->getDefaultSchema();
+        if (array_key_exists($key, $this->fields))
+            $field = $this->fields[$key];
+        elseif ($this->default !== null)
+            $field = $this->default;
         else
             throw new \Exception("Value '{$key}' does not correspond to a valid conditional value");
 
-        if (array_keys(array_keys($schema)) !== array_keys($schema) || is_array(reset($schema))) {
-            $schema = new Schema($schema);
-        } else {
-            $schema = Factory::get($schema);
+        $isAssoc = array_keys(array_keys($field)) !== array_keys($field);
+
+        if ($isAssoc || is_array(reset($field))) {
+            $field = ['collection', $field];
         }
 
-        return $schema;
-    }
+        $field = Factory::get($field);
+        $field->setDataSet($this->getDataSet());
 
-    public function setPath($keyPath)
-    {
-        if (!empty($keyPath)) {
-            if (strpos($keyPath, '/') !== false) {
-                $this->path = explode('/', trim($keyPath, '/'));
-            } else {
-                throw new \Exception(print_r($keyPath, 1) . ' is not valid dataset path');
-            }
-        }
-        return $this;
+        return $field;
     }
 
     private function getSchemaKey()
     {
-        if ($this->dataSet instanceof DataSet) {
-            if (!empty($this->path) && is_array($this->path)) {
-                $key = $this->dataSet->getValueByPath($this->path);
+        if ($this->getDataSet() instanceof DataSet) {
+            if (!empty($this->path)) {
+                $key = $this->dataSet->getValueByPath($this->dataSet->parsePath($this->path));
             } else {
                 throw new \Exception('Wrong dataset path');
             }
@@ -73,16 +59,6 @@ class Conditional extends SchemaElement
         }
 
         return $key;
-    }
-
-    private function getSchemas()
-    {
-        return !empty($this->params['schemas']) ? (array) $this->params['schemas'] : [];
-    }
-
-    private function getDefaultSchema()
-    {
-        return isset($this->params['default']) ? $this->params['default'] : null;
     }
 
     /**

@@ -111,7 +111,20 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             [
                 'a' => ['int', 4],
                 ['padding', 4],
-                'b' => ['string', 10],
+                'b' => ['conditional', '/a', [
+                    'fields' => [
+                        0 => ['int', 8],
+                        3 => ['conditional', '/a', [
+                            'fields' => [
+                                3 => ['string', 6]
+                            ]
+                        ]]
+                    ],
+                    'default' => [
+                        ['int', 8],
+                        ['int', 8]
+                    ]
+                ]],
                 'c' => [
                     'd' => ['int', 8, ['signed' => true]],
                     'd2' => ['int', 8, ['signed' => true]],
@@ -138,7 +151,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                 ]
         ]);
 
-        $stream = new StringStream('1adpiuhf3qurht3094h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfad
+        $stream = new StringStream('1sadfasdfhf3qurht3094h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfad
         adfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf
         890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r1111
         11111ysahf890yasf9sdasdfasdfasdfafadfasdfasdfafadfasfadadfasdf4h02r111111111ysahf
@@ -149,7 +162,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         asdfafadfasfadadfasdfgdbfgasda');
 
         $dataSet = $collection->parse($stream);
-
+print_r($dataSet);
         $this->assertInternalType('int', $dataSet->getData()['a']);
         $this->assertInternalType('string', $dataSet->getData()['b']);
         $this->assertCount(16, $dataSet->getData()['e']);
