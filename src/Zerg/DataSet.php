@@ -2,14 +2,10 @@
 
 namespace Zerg;
 
-class DataSet implements \ArrayAccess, \Iterator
+class DataSet
 {
     private $data = [];
-
-    /**
-     * @var self
-     * */
-    private $parent = null;
+    private $currentPath = [];
 
     /**
      * @param array $data
@@ -27,100 +23,120 @@ class DataSet implements \ArrayAccess, \Iterator
         return $this->data;
     }
 
-    public function setParent(self $dataSet)
+    /**
+     * Move into a level.
+     *
+     * @param string $level The level to move into.
+     */
+    public function push($level)
     {
-        $this->parent = $dataSet;
+        array_push($this->currentPath, $level);
     }
 
-    public function getParent()
+    /**
+     * Move back out of the current level.
+     */
+    public function pop()
     {
-        return $this->parent;
+        array_pop($this->currentPath);
     }
 
+    /**
+     * Set a value in the current level.
+     *
+     * @param string $name The name of the value to add.
+     * @param string $value The value to add.
+     */
+    public function setValue($name, $value)
+    {
+        $child = & $this->data;
+
+        foreach ($this->currentPath as $part) {
+            if (isset($child[$part])) {
+                $child = & $child[$part];
+            } else {
+                $child[$part] = [];
+                $child = & $child[$part];
+            }
+        }
+
+        $child[$name] = $value;
+    }
+
+    /**
+     * Get a value by name from the current level.
+     * Returns null if the value cannot be found.
+     *
+     * @param string $name The name of the value to retrieve.
+     * @return mixed|null
+     */
+    public function getValue($name)
+    {
+        $child = & $this->data;
+
+        foreach ($this->currentPath as $part) {
+            if (isset($child[$part])) {
+                $child = & $child[$part];
+            } else {
+                return null;
+            }
+        }
+
+        return isset($child[$name]) ? $child[$name] : null;
+    }
+
+    /**
+     * Find a value by path within the DataSet instance.
+     * Returns null if the value cannot be found.
+     *
+     * The path is represented as an array of strings representing a route
+     * through the levels of the DataSet to the required value.
+     *
+     * @param array $path A path composed of strings to the value.
+     * @return array|null
+     */
     public function getValueByPath($path)
     {
-        $value = $this;
-        if (strpos($path, '/') === 0) {
-            $value = $this->getRoot();
-        } elseif (strpos($path, './') === 0) {
-            $path = substr($path, 2);
-        }
+        $child = $this->data;
 
-        $pathParts = explode('/', trim($path, '/'));
-
-        foreach ($pathParts as $pathPart) {
-
-            if ($pathPart == '..') {
-                if ($value instanceof self) {
-                    $value = $value->parent;
-                } else {
-                    $value = null;
-                }
-            } elseif (isset($value[$pathPart])) {
-                $value = $value[$pathPart];
-            }
-
-            if ($value === null) {
-                print_r($this->getRoot());
-                throw new \Exception('Wrong path');
+        foreach ($path as $part) {
+            if (isset($child[$part])) {
+                $child = $child[$part];
+            } else {
+                return null;
             }
         }
 
-        return $value;
+        return $child;
     }
 
-    public function getRoot()
+    /**
+     * Assign a value by path within the DataSet instance.
+     * Overwrites any existing value.
+     *
+     * The path is represented as an array of strings representing a route
+     * through the levels of the DataSet to the value to be assigned.
+     *
+     * @param array $path A path composed of strings to the value.
+     * @param mixed $value The value to assign.
+     */
+    public function setValueByPath($path, $value)
     {
-        $dataSet = $this;
-        while ($dataSet->parent) {
-            $dataSet = $dataSet->parent;
+        $endPart = array_pop($path);
+        $child = & $this->data;
+
+        foreach ($path as $part) {
+            if (isset($child[$part])) {
+                $child = & $child[$part];
+            } else {
+                $child[$part] = [];
+                $child = & $child[$part];
+            }
         }
 
-        return $dataSet;
-    }
-
-    public function current()
-    {
-        return current($this->data);
-    }
-
-    public function next()
-    {
-        next($this->data);
-    }
-
-    public function key()
-    {
-        return key($this->data);
-    }
-
-    public function valid()
-    {
-        return isset($this->data[$this->key()]);
-    }
-
-    public function rewind()
-    {
-        reset($this->data);
-    }
-
-    public function offsetExists($offset)
-    {
-        return isset($this->data[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return $this->data[$offset];
-    }
-
-    public function offsetSet($offset, $value)
-    {
-        $this->data[$offset] = $value;
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->data[$offset]);
+        // TODO: Verify that this line does not need to encapsulate
+        // TODO: $value into a single-element array
+        $child[$endPart] = $value;
     }
 }
+

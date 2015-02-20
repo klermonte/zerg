@@ -1,85 +1,53 @@
 <?php
 
-namespace Zerg;
+namespace Zerg\Field;
 
-use Zerg\Field\Countable;
 use Zerg\Stream\AbstractStream;
 
-class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Countable
+class Collection extends AbstractField implements \ArrayAccess, \Iterator, Countable
 {
-    use Field\CountableTrait;
+    use CountableTrait;
 
     /**
-     * @var DataSet
+     * @var AbstractField[]
      */
-    private $dataSet;
-
-    /**
-     * @var SchemaElement[]
-     */
-    private $elements = [];
-
-    private $schemaArray = [];
+    private $children = [];
 
     public function __construct($schemaArray = [], $properties = [])
     {
-        $this->dataSet = new DataSet;
         $this->initFromArray($schemaArray);
         $this->configure($properties);
     }
 
     /**
-     * @return array
+     * @param $name
+     * @param AbstractField $child
      */
-    public function getElements()
+    public function setChild($name, AbstractField $child)
     {
-        return $this->elements;
-    }
-
-    public function setElements($elements)
-    {
-        $this->elements = $elements;
+        $child->setParent($this);
+        $this->children[$name] = $child;
     }
 
     /**
-     * @return DataSet
-     */
-    public function getDataSet()
-    {
-        return $this->dataSet;
-    }
-
-    /**
-     * @param $dataSet
-     */
-    public function setDataSet($dataSet)
-    {
-        $this->dataSet = $dataSet;
-    }
-
-    /**
-     * @param array $array
+     * @param array $fieldArray
      * @throws \Exception
      */
-    private function initFromArray($array = [])
+    private function initFromArray($fieldArray = [])
     {
-        $this->schemaArray = $array;
-        foreach ($array as $elementName => $elementParams) {
+        foreach ($fieldArray as $fieldName => $fieldParams) {
 
-            if (!is_array($elementParams)) {
+            if (!is_array($fieldParams)) {
                 throw new \Exception('Unknown element declaration');
             }
 
-            $paramsKeys = array_keys($elementParams);
+            $isAssoc = array_keys(array_keys($fieldParams)) !== array_keys($fieldParams);
 
-            if (array_keys($paramsKeys) !== $paramsKeys || is_array(reset($elementParams))) {
-                $elementParams = ['schema', $elementParams];
+            if ($isAssoc || is_array(reset($fieldParams))) {
+                $fieldParams = ['collection', $fieldParams];
             }
 
-            $element = Field\Factory::get($elementParams);
-
-            $element->setParent($this);
-            $this->elements[$elementName] = $element;
+            $this->setChild($fieldName, Factory::get($fieldParams));
         }
     }
 
@@ -87,7 +55,7 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
     {
         $currentDataSet = $this->dataSet;
 
-        foreach ($this->elements as $elementName => $element) {
+        foreach ($this->child as $elementName => $element) {
 
             if ($element instanceof self) {
 
@@ -119,19 +87,6 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
         // TODO: Implement write() method.
     }
 
-    public function clear()
-    {
-        $dataSet = new DataSet;
-        $dataSet->setParent($this->getParent()->getDataSet());
-        $this->setDataSet($dataSet);
-
-        foreach ($this->elements as $element) {
-            if ($element instanceof self) {
-                $element->clear();
-            }
-        }
-    }
-
     /**
      * Whether a offset exists
      * @param mixed $offset An offset to check for
@@ -139,28 +94,28 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function offsetExists($offset)
     {
-        return isset($this->elements[$offset]);
+        return isset($this->child[$offset]);
     }
 
     /**
      * Return field instance by given offset
      * @param mixed $offset The offset to retrieve
-     * @return SchemaElement
+     * @return AbstractField
      */
     public function offsetGet($offset)
     {
-        return $this->elements[$offset];
+        return $this->child[$offset];
     }
 
     /**
      * add field or sub schema by given offset
      * @param mixed $offset The offset to assign the value to.
-     * @param SchemaElement $value The value to set
+     * @param AbstractField $value The value to set
      * @return void
      */
     public function offsetSet($offset, $value)
     {
-        $this->elements[$offset] = $value;
+        $this->child[$offset] = $value;
     }
 
     /**
@@ -170,16 +125,16 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function offsetUnset($offset)
     {
-        unset($this->elements[$offset]);
+        unset($this->child[$offset]);
     }
 
     /**
      * Return the current element
-     * @return SchemaElement
+     * @return AbstractField
      */
     public function current()
     {
-        return current($this->elements);
+        return current($this->child);
     }
 
     /**
@@ -188,7 +143,7 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function next()
     {
-        next($this->elements);
+        next($this->child);
     }
 
     /**
@@ -197,7 +152,7 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function key()
     {
-        return key($this->elements);
+        return key($this->child);
     }
 
     /**
@@ -207,7 +162,7 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function valid()
     {
-        return isset($this->elements[$this->key()]);
+        return isset($this->child[$this->key()]);
     }
 
     /**
@@ -216,6 +171,6 @@ class Schema extends SchemaElement implements \ArrayAccess, \Iterator, Field\Cou
      */
     public function rewind()
     {
-        reset($this->elements);
+        reset($this->child);
     }
 }
