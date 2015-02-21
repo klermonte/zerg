@@ -4,20 +4,16 @@ namespace Zerg;
 
 class DataSetTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Zerg\DataSet::getData
-     */
+
     public function testGetData()
     {
-        $data = new DataSet(['a' => 'b']);
+        $dataSet = new DataSet(['a' => 'b']);
+        $data = $dataSet->getData();
         $this->assertArrayHasKey('a', $data);
         $this->assertEquals('b', $data['a']);
         $this->assertCount(1, $data);
     }
 
-    /**
-     * @covers Zerg\DataSet::setValue
-     */
     public function testFlatSetValue()
     {
         $data = new DataSet();
@@ -26,40 +22,28 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $data['foo']);
         $this->assertCount(1, $data);
     }
-    
-    /**
-     * @covers Zerg\DataSet::getValue
-     */
+
     public function testFlatGetValue()
     {
         $dataSet = new DataSet();
         $dataSet->setValue('foo', 'bar');
         $this->assertEquals('bar', $dataSet->getValue('foo'));
     }
-    
-    /**
-     * @covers Zerg\DataSet::getValueByPath
-     */
+
     public function testFlatGetValueByPath()
     {
         $dataSet = new DataSet();
         $dataSet->setValue('foo', 'bar');
         $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
     }
-    
-    /**
-     * @covers Zerg\DataSet::setValueByPath
-     */
+
     public function testFlatSetValueByPath()
     {
         $dataSet = new DataSet();
         $dataSet->setValueByPath(['foo'], 'bar');
         $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
     }
-    
-    /**
-     * @covers Zerg\DataSet::push
-     */
+
     public function testNestedSetValue()
     {
         $dataSet = new DataSet();
@@ -71,10 +55,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
             ]
         ], $dataSet->getData());
     }
-    
-    /**
-     * @covers Zerg\DataSet::getValue
-     */
+
     public function testNestedGetValue()
     {
         $dataSet = new DataSet();
@@ -82,10 +63,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet->setValue('foo', 'bar');
         $this->assertEquals('bar', $dataSet->getValue('foo'));
     }
-    
-    /**
-     * @covers Zerg\DataSet::getValueByPath
-     */
+
     public function testNestedGetValueByPath()
     {
         $dataSet = new DataSet();
@@ -94,9 +72,6 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $dataSet->getValueByPath(['level1', 'foo'], true));
     }
 
-    /**
-     * @covers Zerg\DataSet::setValueByPath
-     */
     public function testNestedSetValueByPath()
     {
         $dataSet = new DataSet();

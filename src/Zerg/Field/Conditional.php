@@ -7,10 +7,9 @@ use Zerg\Stream\AbstractStream;
 
 class Conditional extends AbstractField
 {
-    private $path = '';
-
-    public $fields = [];
-    public $default = null;
+    protected $path = '';
+    protected $fields = [];
+    protected $default = null;
 
     public function __construct($path, $properties = [])
     {

@@ -8,6 +8,22 @@ class Int extends Scalar
 {
     protected $signed;
 
+    /**
+     * @return mixed
+     */
+    public function getSigned()
+    {
+        return $this->signed;
+    }
+
+    /**
+     * @param mixed $signed
+     */
+    public function setSigned($signed)
+    {
+        $this->signed = $signed;
+    }
+
     public function read(AbstractStream $stream)
     {
         $size = $this->getSize();
@@ -29,7 +45,7 @@ class Int extends Scalar
 
     private function int8($data)
     {
-        $ord = ord($data);
+        $ord = $this->uInt8($data);
         return ($ord > 127)
             ? -$ord - 2 * (128 - $ord)
             : $ord;

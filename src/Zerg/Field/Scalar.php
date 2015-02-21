@@ -11,6 +11,22 @@ abstract class Scalar extends AbstractField implements Countable, Sizeable
 
     protected $valueCallback;
 
+    /**
+     * @return mixed
+     */
+    public function getValueCallback()
+    {
+        return $this->valueCallback;
+    }
+
+    /**
+     * @param mixed $valueCallback
+     */
+    public function setValueCallback($valueCallback)
+    {
+        $this->valueCallback = $valueCallback;
+    }
+
     abstract public function read(AbstractStream $stream);
 
     public function __construct($size, $properties = [])

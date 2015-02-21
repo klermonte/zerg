@@ -12,7 +12,7 @@ class DataSet implements \ArrayAccess, \Iterator
      */
     public function __construct($data = [])
     {
-        $this->data = (array) $data;
+        $this->setData($data);
     }
 
     /**
@@ -21,6 +21,14 @@ class DataSet implements \ArrayAccess, \Iterator
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData($data)
+    {
+        $this->data = (array) $data;
     }
 
     /**

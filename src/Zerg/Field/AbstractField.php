@@ -26,7 +26,12 @@ abstract class AbstractField
     public function configure($properties = [])
     {
         foreach ((array) $properties as $name => $value) {
-            $this->$name = $value;
+            $setter = 'set' . $name;
+            if (method_exists($this, $setter)) {
+                $this->$setter($value);
+            } else {
+                $this->$name = $value;
+            }
         }
     }
 

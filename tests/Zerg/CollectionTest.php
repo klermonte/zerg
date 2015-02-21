@@ -7,12 +7,6 @@ use Zerg\Stream\StringStream;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Zerg\Field\Collection::offsetExists
-     * @covers Zerg\Field\Collection::offsetGet
-     * @covers Zerg\Field\Collection::offsetSet
-     * @covers Zerg\Field\Collection::offsetUnset
-     * */
     public function testArrayAccess()
     {
         $collection = new Collection([
@@ -29,13 +23,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(isset($collection['a']));
     }
 
-    /**
-     * @covers Zerg\Field\Collection::current
-     * @covers Zerg\Field\Collection::next
-     * @covers Zerg\Field\Collection::key
-     * @covers Zerg\Field\Collection::valid
-     * @covers Zerg\Field\Collection::rewind
-     * */
     public function testIterator()
     {
         $types = [
@@ -66,9 +53,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    /**
-     * @covers Zerg\Field\Collection::initFromArray
-     * */
     public function testInitFromArray()
     {
         $collection = new Collection([
@@ -102,9 +86,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($collection['f'], $collection['f']['fc']->getParent());
     }
 
-    /**
-     * @covers \Zerg\Field\Collection::parse
-     * */
     public function testParse()
     {
         $collection = new Collection(
@@ -162,7 +143,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         asdfafadfasfadadfasdfgdbfgasda');
 
         $dataSet = $collection->parse($stream);
-print_r($dataSet);
+
         $this->assertInternalType('int', $dataSet->getData()['a']);
         $this->assertInternalType('string', $dataSet->getData()['b']);
         $this->assertCount(16, $dataSet->getData()['e']);

@@ -7,10 +7,15 @@ use Zerg\Stream\StringStream;
 
 class ConditionalTest extends \PHPUnit_Framework_TestCase
 {
-    public function testRead()
+    /**
+     * @covers \Zerg\Field\Conditional::setDataSet
+     * @covers \Zerg\Field\Conditional::configure
+     * @covers \Zerg\Field\Conditional::parse
+     */
+    public function testParse()
     {
         $field = new Conditional('/c/d', [
-            'schemas' => [
+            'fields' => [
                 1 => [
                     'wqe' => ['int', 8],
                     'asd' => ['string', 2]
@@ -32,18 +37,18 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
 
         $stream = new StringStream('123abcdefg');
 
-        $schema = $field->read($stream);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $schema);
+        $returnField = $field->parse($stream);
+        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField);
 
-        $field->setPath('/a');
-        $schema = $field->read($stream);
-        $this->assertInstanceOf('\\Zerg\\Schema', $schema);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $schema->getFields()['wqe']);
-        $this->assertInstanceOf('\\Zerg\\Field\\String', $schema->getFields()['asd']);
+        $field->configure(['path' => '/a']);
+        $returnField = $field->parse($stream);
+        $this->assertInstanceOf('\\Zerg\\Field\\Collection', $returnField);
+        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField['wqe']);
+        $this->assertInstanceOf('\\Zerg\\Field\\String', $returnField['asd']);
 
-        $field->setPath('/b');
-        $schema = $field->read($stream);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $schema->getFields()['int']);
+        $field->configure(['path' => '/b']);
+        $returnField = $field->parse($stream);
+        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField['int']);
 
     }
 }

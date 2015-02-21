@@ -4,13 +4,9 @@ namespace Zerg\Stream;
 
 class FileStreamTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Zerg\Stream\FileStream::read
-     * @covers Zerg\Stream\FileStream::skip
-     * */
     public function testRead()
     {
-        $stream = new FileStream(dirname(__DIR__) . '/data');
+        $stream = new FileStream(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'data');
         $this->assertEquals('1', $stream->read(8));
         $stream->skip(16);
         $this->assertEquals('a', $stream->read(8));

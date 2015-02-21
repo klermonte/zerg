@@ -21,7 +21,7 @@ trait SizeableTrait
     
     public function setSize($size)
     {
-        if ($parsed = $this->parseSizeWord($this->size)) {
+        if ($parsed = $this->parseSizeWord($size)) {
             $this->size = $parsed;
         } else {
             $this->size = $size;
@@ -37,7 +37,6 @@ trait SizeableTrait
         if (!is_numeric($this->size)) {
             if (strpos($this->size, '/') !== false) {
                 if (($dataSet = $this->getDataSet()) instanceof DataSet) {
-                    die('here');
                     $this->size = $dataSet->getValueByPath($dataSet->parsePath($this->size));
                     return $this->getSize();
                 } else {
