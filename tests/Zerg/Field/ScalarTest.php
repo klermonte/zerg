@@ -6,14 +6,6 @@ use Zerg\Stream\StringStream;
 
 class ScalarTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Zerg\Field\Scalar::__construct
-     * @covers \Zerg\Field\Scalar::configure
-     * @covers \Zerg\Field\Scalar::setSize
-     * @covers \Zerg\Field\Scalar::getSize
-     * @covers \Zerg\Field\Scalar::setValueCallback
-     * @covers \Zerg\Field\Scalar::getValueCallback
-     * */
     public function testCreation()
     {
         $callback = function($value) {
@@ -30,10 +22,6 @@ class ScalarTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($field->getSigned());
     }
 
-    /**
-     * @covers \Zerg\Field\Scalar::format
-     * @covers \Zerg\Field\Scalar::parse
-     * */
     public function testValueCallback()
     {
         $stream = new StringStream('123abcdefgqwertyahnytjssdadfkjhb');

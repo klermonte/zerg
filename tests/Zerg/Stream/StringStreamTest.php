@@ -4,10 +4,6 @@ namespace Zerg\Stream;
 
 class StringStreamTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers Zerg\Stream\StringStream::read
-     * @covers Zerg\Stream\StringStream::skip
-     * */
     public function testRead()
     {
         $stream = new StringStream('123abcdefg');

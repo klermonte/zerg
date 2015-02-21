@@ -6,9 +6,6 @@ use Zerg\DataSet;
 
 class SizeableTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Zerg\Field\SizeableTrait::parseSizeWord
-     * */
     public function testWordLength()
     {
         $field = new Int('semi_nibble');
@@ -18,10 +15,6 @@ class SizeableTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(16, $field->getSize());
     }
 
-    /**
-     * @covers \Zerg\Field\Sizeable::getSize
-     * @covers \Zerg\Field\Sizeable::setSize
-     * */
     public function testConditionalSize()
     {
         $field = new Int('semi_nibble');
@@ -52,9 +45,6 @@ class SizeableTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    /**
-     * @covers \Zerg\Field\Sizeable::getSize
-     * */
     public function testSizeCallback()
     {
         $field = new Int(8, [

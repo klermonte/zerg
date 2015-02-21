@@ -6,11 +6,6 @@ use Zerg\Stream\StringStream;
 
 class IntTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Zerg\Field\Int::configure
-     * @covers \Zerg\Field\Int::getSigned
-     * @covers \Zerg\Field\Int::setSigned
-     */
     public function testConfiguration()
     {
         $int = new Int(1, ['signed' => true]);
@@ -21,11 +16,6 @@ class IntTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($int->getSigned());
     }
 
-    /**
-     * @covers \Zerg\Field\Int::read
-     * @covers \Zerg\Field\Int::int8
-     * @covers \Zerg\Field\Int::uInt8
-     */
     public function testRead()
     {
         $stream = new StringStream("\x03\x80\x80");

@@ -7,11 +7,6 @@ use Zerg\Stream\StringStream;
 
 class ConditionalTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @covers \Zerg\Field\Conditional::setDataSet
-     * @covers \Zerg\Field\Conditional::configure
-     * @covers \Zerg\Field\Conditional::parse
-     */
     public function testParse()
     {
         $field = new Conditional('/c/d', [
