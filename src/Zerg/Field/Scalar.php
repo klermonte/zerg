@@ -2,8 +2,6 @@
 
 namespace Zerg\Field;
 
-use Zerg\DataSet;
-use Zerg\SchemaElement;
 use Zerg\Stream\AbstractStream;
 
 abstract class Scalar extends AbstractField implements Countable, Sizeable
