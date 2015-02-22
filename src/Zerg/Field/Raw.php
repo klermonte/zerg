@@ -8,7 +8,7 @@ class Raw extends Scalar
 {
     public function read(AbstractStream $stream)
     {
-        return $stream->read($this->getLength());
+        return $stream->read($this->getSize());
     }
 
     /**

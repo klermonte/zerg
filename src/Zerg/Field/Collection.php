@@ -5,19 +5,16 @@ namespace Zerg\Field;
 use Zerg\DataSet;
 use Zerg\Stream\AbstractStream;
 
-class Collection extends AbstractField implements \ArrayAccess, \Iterator, Countable
+class Collection extends AbstractField implements \ArrayAccess, \Iterator
 {
-    use CountableTrait;
-
     /**
      * @var AbstractField[]
      */
     private $children = [];
 
-    public function __construct($schemaArray = [], $properties = [])
+    public function setMainParam($schemaArray)
     {
         $this->initFromArray($schemaArray);
-        $this->configure($properties);
     }
 
     /**
@@ -84,11 +81,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator, Count
 
             } else {
 
-                if ($fieldObj instanceof Countable && $fieldObj->getCount() > 1) {
-
-                    /**
-                     * @var $fieldObj AbstractField | Countable
-                     * */
+                if ($fieldObj->getCount() > 1) {
 
                     $dataSet->push($fieldName);
                     for ($i = 0; $i < $fieldObj->getCount(); $i++) {

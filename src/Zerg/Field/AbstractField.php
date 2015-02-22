@@ -17,7 +17,16 @@ abstract class AbstractField
      */
     protected $dataSet = null;
 
-    abstract public function __construct($mainParam, $properties = []);
+    protected $count = 1;
+    protected $countCallback;
+
+    public function __construct($mainParam, $properties = [])
+    {
+        $this->setMainParam($mainParam);
+        $this->configure($properties);
+    }
+
+    abstract public function setMainParam($mainParam);
 
     abstract public function parse(AbstractStream $stream);
 
@@ -71,5 +80,52 @@ abstract class AbstractField
         return $this;
     }
 
+    public function setCount($count)
+    {
+        $this->count = $count;
+    }
 
+    protected function resolveProperty($name)
+    {
+        $propertyValue = $this->$name;
+        if (!is_numeric($propertyValue)) {
+            if (strpos($propertyValue, '/') !== false) {
+                if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+                    while (strpos($propertyValue, '/') !== false) {
+                        $propertyValue = $dataSet->getValueByPath($dataSet->parsePath($this->$name));
+                        $this->$name = $propertyValue;
+                    }
+                } else {
+                    throw new \Exception('DataSet required to get value by path');
+                }
+            } else {
+                throw new \Exception("'{$propertyValue}' is not valid {$name} value");
+            }
+        }
+
+
+        return $propertyValue;
+    }
+
+    protected function getCallbackableProperty($name)
+    {
+        $callbackName = strtolower($name) . 'Callback';
+        $value = $this->$name;
+        if (is_callable($this->$callbackName)) {
+            $value = call_user_func($this->$callbackName, $value);
+        }
+        return $value;
+    }
+
+    public function getCount()
+    {
+        $this->resolveProperty('count');
+        $count = $this->getCallbackableProperty('count');
+
+        if ($count < 0) {
+            throw new \Exception('Field count should not be less 0');
+        }
+
+        return $count;
+    }
 }

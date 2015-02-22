@@ -11,10 +11,9 @@ class Conditional extends AbstractField
     protected $fields = [];
     protected $default = null;
 
-    public function __construct($path, $properties = [])
+    public function setMainParam($path)
     {
         $this->path = $path;
-        $this->configure($properties);
     }
 
     /**

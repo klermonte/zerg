@@ -4,11 +4,20 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
-abstract class Scalar extends AbstractField implements Countable, Sizeable
+abstract class Scalar extends AbstractField
 {
-    use CountableTrait;
-    use SizeableTrait;
+    private $sizes = [
+        'BIT'         => 1,
+        'SEMI_NIBBLE' => 2,
+        'NIBBLE'      => 4,
+        'BYTE'        => 8,
+        'SHORT'       => 16,
+        'WORD'        => 32,
+        'DWORD'       => 64,
+    ];
 
+    protected $size;
+    protected $sizeCallback;
     protected $valueCallback;
 
     /**
@@ -29,10 +38,9 @@ abstract class Scalar extends AbstractField implements Countable, Sizeable
 
     abstract public function read(AbstractStream $stream);
 
-    public function __construct($size, $properties = [])
+    public function setMainParam($size)
     {
         $this->setSize($size);
-        $this->configure($properties);
     }
 
     public function parse(AbstractStream $stream)
@@ -46,5 +54,37 @@ abstract class Scalar extends AbstractField implements Countable, Sizeable
             $value = call_user_func($this->valueCallback, $value);
         }
         return $value;
+    }
+
+    public function setSize($size)
+    {
+        if ($parsed = $this->parseSizeWord($size)) {
+            $this->size = $parsed;
+        } else {
+            $this->size = $size;
+        }
+    }
+
+    public function getSize()
+    {
+        $this->resolveProperty('size');
+        $size = $this->getCallbackableProperty('size');
+
+        if ($size < 0) {
+            throw new \Exception('Element size should not be less 0');
+        }
+
+        return $size;
+    }
+
+    public function parseSizeWord($word)
+    {
+        $size = strtoupper(preg_replace('/([a-z])([A-Z])/', '$1_$2', $word));
+        if (array_key_exists($size, $this->sizes)) {
+            $size = $this->sizes[$size];
+        } else {
+            $size = 0;
+        }
+        return $size;
     }
 }

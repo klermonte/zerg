@@ -4,17 +4,9 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
-class Padding extends AbstractField implements Sizeable
+class Padding extends Scalar
 {
-    use SizeableTrait;
-
-    public function __construct($size, $properties = [])
-    {
-        $this->setSize($size);
-        $this->configure($properties);
-    }
-
-    public function parse(AbstractStream $stream)
+    public function read(AbstractStream $stream)
     {
         $stream->skip($this->getSize());
         return null;
