@@ -7,10 +7,7 @@ php:
   - hhvm
 
 install:
-  - composer install --dev
+  - composer install
 
 script:
-  - mkdir -p build/logs
-  - phpunit --coverage-clover build/logs/clover.xml
-  - CODECLIMATE_REPO_TOKEN="a789709d7673011c8989243b59bef342a66785ca1c1d3650bd68eebf2c103f7" vendor/bin/test-reporter --stdout > codeclimate.json
-  - "curl -X POST -d @codeclimate.json -H 'Content-Type: application/json' -H 'User-Agent: Code Climate (PHP Test Reporter v0.1.1)' https://codeclimate.com/test_reports"
+  - phpunit --coverage-text
