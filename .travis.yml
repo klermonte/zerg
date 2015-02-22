@@ -8,14 +8,8 @@ php:
 
 install:
   - composer install --dev
-  - composer require codeclimate/php-test-reporter --dev
 
 script:
+  - mkdir -p build/logs
   - phpunit --coverage-clover build/logs/clover.xml
-
-addons:
-  code_climate:
-    repo_token: a789709d7673011c8989243b59bef342a66785ca1c1d3650bd68eebf2c103f7
-
-after_script:
-  - vendor/bin/test-reporter
+  - CODECLIMATE_REPO_TOKEN=a789709d7673011c8989243b59bef342a66785ca1c1d3650bd68eebf2c103f7 vendor/bin/test-reporter
