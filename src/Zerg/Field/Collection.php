@@ -91,15 +91,10 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
 
                 } else {
 
-                    while ($fieldObj instanceof Conditional) {
-                        $fieldObj = $fieldObj->parse($stream);
-                    }
-
                     $value = $fieldObj->parse($stream);
                     if ($value !== null) {
                         $dataSet->setValue($fieldName, $value);
                     }
-
                 }
             }
         }

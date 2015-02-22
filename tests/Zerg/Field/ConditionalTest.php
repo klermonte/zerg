@@ -15,9 +15,12 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
                     'wqe' => ['int', 8],
                     'asd' => ['string', 2]
                 ],
-                5 => [
-                    'int' => ['int', 2]
-                ],
+                5 => ['int', 8],
+                10 => ['conditional', '/a', [
+                    'fields' => [
+                        1 => ['string', 6]
+                    ]
+                ]]
             ],
             'default' => ['int', 8]
         ]);
@@ -26,24 +29,33 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
             'a' => 1,
             'b' => 5,
             'c' => [
-                'd' => 3
+                'd' => 3,
+                'e' => 10,
+                'f' => '/c/d'
             ]
         ]));
 
-        $stream = new StringStream('123abcdefg');
+        $stream = new StringStream('123abcdefghiklm');
 
-        $returnField = $field->parse($stream);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField);
+        $value = $field->parse($stream);
+        $this->assertSame(49, $value);
 
-        $field->configure(['path' => '/a']);
-        $returnField = $field->parse($stream);
-        $this->assertInstanceOf('\\Zerg\\Field\\Collection', $returnField);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField['wqe']);
-        $this->assertInstanceOf('\\Zerg\\Field\\String', $returnField['asd']);
+        $field->configure(['key' => '/a']);
+        $value = $field->parse($stream);
+        $this->assertInstanceOf('\\Zerg\\DataSet', $value);
+        $this->assertSame(50, $value['wqe']);
+        $this->assertSame('3a', $value['asd']);
 
-        $field->configure(['path' => '/b']);
-        $returnField = $field->parse($stream);
-        $this->assertInstanceOf('\\Zerg\\Field\\Int', $returnField['int']);
+        $field->configure(['key' => '/b']);
+        $value = $field->parse($stream);
+        $this->assertSame(ord('b'), $value);
 
+        $field->configure(['key' => '/c/e']);
+        $value = $field->parse($stream);
+        $this->assertSame('cdefgh', $value);
+
+        $field->configure(['key' => '/c/f']);
+        $value = $field->parse($stream);
+        $this->assertSame(ord('i'), $value);
     }
 }

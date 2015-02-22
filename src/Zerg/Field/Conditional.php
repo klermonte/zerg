@@ -7,23 +7,36 @@ use Zerg\Stream\AbstractStream;
 
 class Conditional extends AbstractField
 {
-    protected $path = '';
+    protected $key = null;
     protected $fields = [];
     protected $default = null;
 
-    public function setMainParam($path)
+    public function setMainParam($key)
     {
-        $this->path = $path;
+        $this->key = $key;
     }
 
     /**
      * @param AbstractStream $stream
-     * @return AbstractField
-     * @throws \Exception
+     * @return mixed
      */
     public function parse(AbstractStream $stream)
     {
-        $key = $this->getSchemaKey();
+        $field = $this;
+        do {
+            $field = $field->resolve();
+        } while ($field instanceof self);
+
+        return $field->parse($stream);
+    }
+
+    /**
+     * @return AbstractField
+     * @throws \Exception
+     */
+    private function resolve()
+    {
+        $key = $this->resolveProperty('key');
 
         if (array_key_exists($key, $this->fields))
             $field = $this->fields[$key];
@@ -42,21 +55,6 @@ class Conditional extends AbstractField
         $field->setDataSet($this->getDataSet());
 
         return $field;
-    }
-
-    private function getSchemaKey()
-    {
-        if ($this->getDataSet() instanceof DataSet) {
-            if (!empty($this->path)) {
-                $key = $this->dataSet->getValueByPath($this->dataSet->parsePath($this->path));
-            } else {
-                throw new \Exception('Wrong dataset path');
-            }
-        } else {
-            throw new \Exception('Dataset required to get value by path');
-        }
-
-        return $key;
     }
 
     /**
