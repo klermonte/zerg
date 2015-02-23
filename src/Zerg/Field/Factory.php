@@ -7,7 +7,7 @@ class Factory
     /**
      * @param array $elementParams
      * @return AbstractField
-     * @throws \Exception
+     * @throws ConfigurationException
      */
     public static function get($elementParams = [])
     {
@@ -18,7 +18,7 @@ class Factory
             return new $class(array_shift($elementParams), array_shift($elementParams));
         }
 
-        throw new \Exception("Field {$elementType} doesn't exist");
+        throw new ConfigurationException("Field {$elementType} doesn't exist");
 
     }
 }

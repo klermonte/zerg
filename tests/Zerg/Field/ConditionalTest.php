@@ -7,9 +7,12 @@ use Zerg\Stream\StringStream;
 
 class ConditionalTest extends \PHPUnit_Framework_TestCase
 {
-    public function testParse()
+    public $field;
+    public $stream;
+
+    public function setUp()
     {
-        $field = new Conditional('/c/d', [
+        $this->field = new Conditional('/c/d', [
             'fields' => [
                 1 => [
                     'wqe' => ['int', 8],
@@ -25,7 +28,7 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
             'default' => ['int', 8]
         ]);
 
-        $field->setDataSet(new DataSet([
+        $this->field->setDataSet(new DataSet([
             'a' => 1,
             'b' => 5,
             'c' => [
@@ -35,7 +38,13 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
             ]
         ]));
 
-        $stream = new StringStream('123abcdefghiklm');
+        $this->stream = new StringStream('123abcdefghiklm');
+    }
+
+    public function testParse()
+    {
+        $field = $this->field;
+        $stream = $this->stream;
 
         $value = $field->parse($stream);
         $this->assertSame(49, $value);
@@ -57,5 +66,23 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $field->configure(['key' => '/c/f']);
         $value = $field->parse($stream);
         $this->assertSame(ord('i'), $value);
+    }
+
+    /**
+     * @expectedException \Zerg\Field\InvalidKeyException
+     * */
+    public function testKeyException()
+    {
+        $this->field->configure(['key' => '/a/y', 'default' => null]);
+        $this->field->parse($this->stream);
+    }
+
+    /**
+     * @expectedException \Zerg\Field\ConfigurationException
+     * */
+    public function testConfigException()
+    {
+        $this->field->configure(['key' => 'qwe']);
+        $this->field->parse($this->stream);
     }
 }

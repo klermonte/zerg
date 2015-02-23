@@ -32,18 +32,22 @@ class Conditional extends AbstractField
 
     /**
      * @return AbstractField
-     * @throws \Exception
+     * @throws InvalidKeyException
      */
     private function resolve()
     {
         $key = $this->resolveProperty('key');
 
-        if (array_key_exists($key, $this->fields))
+        if (array_key_exists($key, $this->fields)) {
             $field = $this->fields[$key];
-        elseif ($this->default !== null)
+        } elseif ($this->default !== null) {
             $field = $this->default;
-        else
-            throw new \Exception("Value '{$key}' does not correspond to a valid conditional value");
+        } else {
+            throw new InvalidKeyException(
+                "Value '{$key}' does not correspond to a valid conditional key. Presented keys: '" .
+                implode("', '", array_keys($this->fields)) . "'"
+            );
+        }
 
         $isAssoc = array_keys(array_keys($field)) !== array_keys($field);
 

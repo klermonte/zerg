@@ -96,10 +96,10 @@ abstract class AbstractField
                         $this->$name = $propertyValue;
                     }
                 } else {
-                    throw new \Exception('DataSet required to get value by path');
+                    throw new ConfigurationException('DataSet required to get value by path');
                 }
             } else {
-                throw new \Exception("'{$propertyValue}' is not valid {$name} value");
+                throw new ConfigurationException("'{$propertyValue}' is not valid {$name} value");
             }
         }
 
@@ -123,7 +123,7 @@ abstract class AbstractField
         $count = $this->getCallbackableProperty('count');
 
         if ($count < 0) {
-            throw new \Exception('Field count should not be less 0');
+            throw new ConfigurationException('Field count should not be less 0');
         }
 
         return $count;

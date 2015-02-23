@@ -29,14 +29,14 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
 
     /**
      * @param array $fieldArray
-     * @throws \Exception
+     * @throws ConfigurationException
      */
     private function initFromArray($fieldArray = [])
     {
         foreach ($fieldArray as $fieldName => $fieldParams) {
 
             if (!is_array($fieldParams)) {
-                throw new \Exception('Unknown element declaration');
+                throw new ConfigurationException('Unknown element declaration');
             }
 
             $isAssoc = array_keys(array_keys($fieldParams)) !== array_keys($fieldParams);

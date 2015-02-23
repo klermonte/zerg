@@ -42,7 +42,7 @@ abstract class AbstractStream
 
             } else {
 
-                throw new \Exception('End of file');
+                throw new EofException('End of file');
 
             }
         }
@@ -93,7 +93,7 @@ abstract class AbstractStream
 
             } else {
 
-                throw new \Exception('End of file');
+                throw new EofException('End of file');
 
             }
         }

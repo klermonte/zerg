@@ -16,11 +16,27 @@ class EnumTest extends \PHPUnit_Framework_TestCase
             'default' => 'default'
         ]);
 
-        $data = '123abcdefg';
-        $stream = new StringStream($data);
+        $stream = new StringStream('123abcdefg');
 
         $this->assertEquals('right', $field->read($stream));
         $this->assertEquals('default', $field->read($stream));
 
+    }
+
+    /**
+     * @expectedException \Zerg\Field\InvalidKeyException
+     * */
+    public function testKeyException()
+    {
+        $field = new Enum(8, [
+            'values' => [
+                49 => 'right',
+                32 => 'wrong',
+            ]
+        ]);
+
+        $stream = new StringStream('223abcdefg');
+
+        $field->read($stream);
     }
 }

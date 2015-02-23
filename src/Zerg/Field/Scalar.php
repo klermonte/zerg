@@ -71,7 +71,7 @@ abstract class Scalar extends AbstractField
         $size = $this->getCallbackableProperty('size');
 
         if ($size < 0) {
-            throw new \Exception('Element size should not be less 0');
+            throw new ConfigurationException('Element size should not be less 0');
         }
 
         return $size;

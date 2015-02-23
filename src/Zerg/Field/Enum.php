@@ -22,9 +22,9 @@ class Enum extends Int
         }
 
         if (is_null($value)) {
-            throw new \Exception(
-                "Value '{$key}' does not correspond to a valid enum value. Given options: " .
-                print_r($values, true)
+            throw new InvalidKeyException(
+                "Value '{$key}' does not correspond to a valid enum key. Presented keys: '" .
+                implode("', '", array_keys($values)) . "'"
             );
         }
 

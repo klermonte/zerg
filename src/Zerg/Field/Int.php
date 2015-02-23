@@ -37,7 +37,7 @@ class Int extends Scalar
                 ? $this->int8($raw)
                 : $this->uInt8($raw);
         } else {
-            throw new \Exception('Integer longer 8 bits not implemented yet');
+            throw new ConfigurationException('Integer longer 8 bits not implemented yet');
         }
 
         return $value;
