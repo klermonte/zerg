@@ -5,6 +5,37 @@ namespace Zerg;
 class DataSetTest extends \PHPUnit_Framework_TestCase
 {
 
+    public function testArrayAccess()
+    {
+        $dataSet = new DataSet(['a' => 'b']);
+        $dataSet['c'] = 'd';
+        $this->assertArrayHasKey('a', $dataSet);
+        $this->assertArrayHasKey('c', $dataSet);
+        $this->assertEquals('b', $dataSet['a']);
+        $this->assertEquals('d', $dataSet['c']);
+        $this->assertCount(2, $dataSet);
+        unset($dataSet['a']);
+        $this->assertArrayNotHasKey('a', $dataSet);
+        $this->assertCount(1, $dataSet);
+    }
+
+    public function testIterator()
+    {
+        $dataSet = new DataSet([
+            'a' => 'b',
+            'c' => 'd',
+            'e' => [
+                'f' => 'e'
+            ]
+        ]);
+
+        $dataSet->rewind();
+        while($dataSet->valid()) {
+            $this->assertSame($dataSet[$dataSet->key()], $dataSet->current());
+            $dataSet->next();
+        }
+    }
+
     public function testGetData()
     {
         $dataSet = new DataSet(['a' => 'b']);
@@ -28,20 +59,25 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet = new DataSet();
         $dataSet->setValue('foo', 'bar');
         $this->assertEquals('bar', $dataSet->getValue('foo'));
+        $dataSet->push('nextLevel');
+        $this->assertEquals(null, $dataSet->getValue('foo'));
     }
 
     public function testFlatGetValueByPath()
     {
         $dataSet = new DataSet();
         $dataSet->setValue('foo', 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
+        $this->assertEquals('bar', $dataSet->getValueByPath(['foo']));
+        $this->assertEquals(null, $dataSet->getValueByPath(['foo', 'bar']));
     }
 
     public function testFlatSetValueByPath()
     {
-        $dataSet = new DataSet();
+        $dataSet = new DataSet(['exists' => ['key' => 'value']]);
         $dataSet->setValueByPath(['foo'], 'bar');
-        $this->assertEquals('bar', $dataSet->getValueByPath(['foo'], true));
+        $dataSet->setValueByPath(['exists', 'key'], 'newValue');
+        $this->assertEquals('bar', $dataSet->getValueByPath(['foo']));
+        $this->assertEquals('newValue', $dataSet->getValueByPath(['exists', 'key']));
     }
 
     public function testNestedSetValue()
