@@ -4,11 +4,29 @@ namespace Zerg\Stream;
 
 abstract class AbstractStream
 {
+    /**
+     * @var resource The handle of opened file or stream.
+     * */
     protected $handle = null;
+
+    /**
+     * @var int Current position of internal pointer.
+     * */
     protected $position = 0;
+
+    /**
+     * @var int Size in bytes on stream.
+     * */
     protected $size = 0;
+
+    /**
+     * @var string Buffer for storing separate bits while reading not a multiple of eight field size.
+     * */
     protected $buffer = '';
 
+    /**
+     * @param string $path Path to file.
+     */
     public function __construct($path)
     {
         $this->handle = fopen($path, 'rb');
@@ -20,6 +38,12 @@ abstract class AbstractStream
         fseek($this->handle, 0);
     }
 
+    /**
+     * Read from stream given amount of BITS and return their binary string representation.
+     * @param int $bits Amount of bits to read.
+     * @return string String representation of read bits.
+     * @throws EofException If end of stream has been reached.
+     */
     public function read($bits)
     {
         $bufferSize = strlen($this->buffer);
@@ -34,11 +58,13 @@ abstract class AbstractStream
                 $this->position += $bytes;
                 $readBytes = fread($this->handle, $bytes);
 
-                if (!$bufferSize && !($bits % 8))
+                if (!$bufferSize && !($bits % 8)) {
                     return $readBytes;
+                }
 
-                for($i = 0; $i < $bytes; $i++)
+                for ($i = 0; $i < $bytes; $i++) {
                     $readBits .= str_pad(base_convert(ord($readBytes[$i]), 10, 2), 8, '0', STR_PAD_LEFT);
+                }
 
             } else {
 
@@ -54,13 +80,19 @@ abstract class AbstractStream
 
         $binData = '';
         $eights = str_split($data, 8);
-        foreach ($eights as $eight)
+        foreach ($eights as $eight) {
             $binData .= pack('H*', str_pad(base_convert($eight, 2, 16), 2, '0', STR_PAD_LEFT));
+        }
 
         return $binData;
 
     }
 
+    /**
+     * Move internal pointer ahead on given amount of BITS.
+     * @param integer $bits Amount of bits to bee skipped.
+     * @throws EofException If end of stream has been reached.
+     */
     public function skip($bits)
     {
         $bufferSize = strlen($this->buffer);
@@ -99,6 +131,10 @@ abstract class AbstractStream
         }
     }
 
+
+    /**
+     * Release resources on object destruction.
+     */
     public function __destruct()
     {
         fclose($this->handle);

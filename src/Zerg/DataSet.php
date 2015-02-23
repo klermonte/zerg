@@ -14,7 +14,7 @@ class DataSet implements \ArrayAccess, \Iterator
      *
      * The path is represented as an array of strings representing a route
      * through the levels of the DataSet to the required value.
-     * */
+     */
     private $currentPath = [];
 
     /**
