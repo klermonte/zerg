@@ -4,11 +4,21 @@ namespace Zerg;
 
 class DataSet implements \ArrayAccess, \Iterator
 {
+    /**
+     * @var array Data wrapped by DataSet.
+     * */
     private $data = [];
+
+    /**
+     * @var array Pointer of current insert/read position in internal format.
+     *
+     * The path is represented as an array of strings representing a route
+     * through the levels of the DataSet to the required value.
+     * */
     private $currentPath = [];
 
     /**
-     * @param array $data
+     * @param array $data Data to be wrapped.
      */
     public function __construct($data = [])
     {
@@ -16,7 +26,9 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
-     * @return array
+     * Get wrapped data.
+     *
+     * @return array Currently wrapped data.
      */
     public function getData()
     {
@@ -24,7 +36,8 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
-     * @param array $data
+     * Assign new data to DataSet
+     * @param array $data Data to be wrapped by DataSet.
      */
     public function setData($data)
     {
@@ -73,10 +86,9 @@ class DataSet implements \ArrayAccess, \Iterator
 
     /**
      * Get a value by name from the current level.
-     * Returns null if the value cannot be found.
      *
      * @param string $name The name of the value to retrieve.
-     * @return mixed|null
+     * @return mixed The found value. Returns null if the value cannot be found.
      */
     public function getValue($name)
     {
@@ -95,13 +107,10 @@ class DataSet implements \ArrayAccess, \Iterator
 
     /**
      * Find a value by path within the DataSet instance.
-     * Returns null if the value cannot be found.
      *
-     * The path is represented as an array of strings representing a route
-     * through the levels of the DataSet to the required value.
-     *
-     * @param array $path A path composed of strings to the value.
-     * @return array|null
+     * @see $currentPath
+     * @param array $path Path in internal format.
+     * @return mixed The found value. Returns null if the value cannot be found.
      */
     public function getValueByPath($path)
     {
@@ -122,10 +131,8 @@ class DataSet implements \ArrayAccess, \Iterator
      * Assign a value by path within the DataSet instance.
      * Overwrites any existing value.
      *
-     * The path is represented as an array of strings representing a route
-     * through the levels of the DataSet to the value to be assigned.
-     *
-     * @param array $path A path composed of strings to the value.
+     * @see $currentPath
+     * @param array $path A path in internal format.
      * @param mixed $value The value to assign.
      */
     public function setValueByPath($path, $value)
@@ -142,57 +149,88 @@ class DataSet implements \ArrayAccess, \Iterator
             }
         }
 
-        // TODO: Verify that this line does not need to encapsulate
-        // TODO: $value into a single-element array
         $child[$endPart] = $value;
     }
 
+    /**
+     * Transform human path to internal DataSet format.
+     *
+     * @see $currentPath
+     * @param string $path Path in human format ('/a/b' or 'a/../b')
+     * @return array Path in internal format
+     */
     public function parsePath($path)
     {
         return explode('/', trim($path, '/'));
     }
 
-
+    /**
+     * @inheritdoc
+     * */
     public function current()
     {
         return current($this->data);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function next()
     {
         next($this->data);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function key()
     {
         return key($this->data);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function valid()
     {
         return isset($this->data[$this->key()]);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function rewind()
     {
         reset($this->data);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function offsetExists($offset)
     {
         return isset($this->data[$offset]);
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function offsetGet($offset)
     {
         return $this->data[$offset];
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function offsetSet($offset, $value)
     {
         $this->data[$offset] = $value;
     }
 
+    /**
+     * @inheritdoc
+     * */
     public function offsetUnset($offset)
     {
         unset($this->data[$offset]);
