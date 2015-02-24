@@ -1,0 +1,10 @@
+imports:
+  - php
+
+filter:
+  paths: [src/*]
+
+tools:
+  external_code_coverage:
+    enabled: true
+    timeout: 1800
