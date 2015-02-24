@@ -12,6 +12,6 @@ install:
 script:
   - phpunit --coverage-clover=clover.xml
 
-after-script:
+after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover clover.xml
