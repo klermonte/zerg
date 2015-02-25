@@ -2,6 +2,8 @@
 
 namespace Zerg;
 
+use PhpBinaryReader\BinaryReader;
+use PhpBinaryReader\Endian;
 use Zerg\Field\Collection;
 use Zerg\Stream\StringStream;
 
@@ -90,8 +92,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new Collection(
             [
-                'a' => ['int', 4],
                 ['padding', 4],
+                'a' => ['int', 4],
                 'b' => ['conditional', '/a', [
                     'fields' => [
                         0 => ['int', 8],

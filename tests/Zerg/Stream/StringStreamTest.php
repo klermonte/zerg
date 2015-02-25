@@ -5,17 +5,17 @@ namespace Zerg\Stream;
 class StringStreamTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \Zerg\Stream\EofException
+     * @expectedException \OutOfBoundsException
      * */
     public function testRead()
     {
         $stream = new StringStream('123abcdefg');
-        $this->assertEquals('1', $stream->read(8));
+        $this->assertEquals('1', $stream->getReader()->readString(1));
         $stream->skip(16);
-        $this->assertEquals('a', $stream->read(8));
+        $this->assertEquals('a', $stream->getReader()->readString(1));
         $stream->skip(4);
-        $this->assertEquals('&', $stream->read(8));
-        $this->assertEquals('6', $stream->read(8));
-        $stream->read(200);
+        $this->assertEquals('b', $stream->getReader()->readString(1));
+        $this->assertEquals('c', $stream->getReader()->readString(1));
+        $stream->getReader()->readString(200);
     }
 } 
