@@ -2,6 +2,6 @@
 
 namespace Zerg\Field;
 
-class InvalidKeyException extends \Exception
+class InvalidKeyException extends \UnexpectedValueException
 {
 }

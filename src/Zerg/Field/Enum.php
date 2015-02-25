@@ -12,8 +12,7 @@ class Enum extends Int
     public function read(AbstractStream $stream)
     {
         $key = parent::read($stream);
-
-        $values = $this->getValues();
+        $values = !empty($this->values) ? (array) $this->values : [];
 
         if (array_key_exists($key, $values)) {
             $value = $values[$key];
@@ -29,15 +28,5 @@ class Enum extends Int
         }
 
         return $value;
-    }
-
-    private function getValues()
-    {
-        return !empty($this->values) ? (array) $this->values : [];
-    }
-
-    public function write(AbstractStream $stream, $value)
-    {
-
     }
 } 

@@ -46,20 +46,10 @@ class Int extends Scalar
                         ? $stream->getReader()->readBits($size)
                         : $stream->getReader()->readUBits($size);
                 } else {
-                    new ConfigurationException('Int can not be larger 32 bits');
+                    throw new ConfigurationException('Int can not be larger 32 bits');
                 }
         }
 
         return $value;
-    }
-
-    /**
-     * @param AbstractStream $stream
-     * @param mixed $value
-     * @return bool
-     */
-    public function write(AbstractStream $stream, $value)
-    {
-        // TODO: Implement write() method.
     }
 }

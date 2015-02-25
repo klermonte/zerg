@@ -11,14 +11,4 @@ class Padding extends Scalar
         $stream->skip($this->getSize());
         return null;
     }
-
-    /**
-     * @param AbstractStream $stream
-     * @param mixed $value
-     * @return bool
-     */
-    public function write(AbstractStream $stream, $value)
-    {
-        // TODO: Implement write() method.
-    }
 }

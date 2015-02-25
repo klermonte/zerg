@@ -25,9 +25,13 @@ abstract class AbstractStream
      */
     public function skip($size)
     {
-        $newPositionInBits = $this->reader->getPosition() * 8 + $this->reader->getCurrentBit() + $size;
-        $this->reader->setPosition(intval($newPositionInBits / 8));
-        $this->reader->setCurrentBit($newPositionInBits % 8);
+        $newBits = $size % 8;
+        if (!$this->reader->getCurrentBit() && !$newBits) {
+            $this->reader->setPosition($this->reader->getPosition() + $size / 8);
+        } else {
+            echo 'here' . $size. ' ';
+            $this->reader->readUBits($size);
+        }
     }
 
     /**

@@ -30,8 +30,6 @@ abstract class AbstractField
 
     abstract public function parse(AbstractStream $stream);
 
-    abstract public function write(AbstractStream $stream, $value);
-
     public function configure($properties = [])
     {
         foreach ((array) $properties as $name => $value) {

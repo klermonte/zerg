@@ -2,6 +2,6 @@
 
 namespace Zerg\Field;
 
-class ConfigurationException extends \Exception
+class ConfigurationException extends \InvalidArgumentException
 {
 }
