@@ -14,8 +14,9 @@ class String extends Scalar
 
         if ($this->utf) {
 
-            if (strlen($string) < 2)
+            if (strlen($string) < 2) {
                 return '';
+            }
 
             if (ord($string[0]) == 0xfe && ord($string[1]) == 0xff ||
                 ord($string[0]) == 0xff && ord($string[1]) == 0xfe) {

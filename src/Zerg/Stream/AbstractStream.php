@@ -29,7 +29,6 @@ abstract class AbstractStream
         if (!$this->reader->getCurrentBit() && !$newBits) {
             $this->reader->setPosition($this->reader->getPosition() + $size / 8);
         } else {
-            echo 'here' . $size. ' ';
             $this->reader->readUBits($size);
         }
     }
