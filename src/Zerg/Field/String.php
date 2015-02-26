@@ -44,6 +44,6 @@ class String extends Scalar
 
         }
 
-        return $this->format($string);
+        return $string;
     }
 }
