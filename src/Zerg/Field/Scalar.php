@@ -72,7 +72,7 @@ abstract class Scalar extends AbstractField
     public function getSize()
     {
         $this->resolveProperty('size');
-        $size = $this->getCallbackableProperty('size');
+        $size = (int) $this->getCallbackableProperty('size');
 
         if ($size < 0) {
             throw new ConfigurationException('Element size should not be less 0');

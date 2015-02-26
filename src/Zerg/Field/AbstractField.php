@@ -118,7 +118,7 @@ abstract class AbstractField
     public function getCount()
     {
         $this->resolveProperty('count');
-        $count = $this->getCallbackableProperty('count');
+        $count = (int) $this->getCallbackableProperty('count');
 
         if ($count < 0) {
             throw new ConfigurationException('Field count should not be less 0');
