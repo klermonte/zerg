@@ -39,9 +39,6 @@ class String extends Scalar
                 ord($string[0]) == 0xff && ord($string[1]) == 0xfe) {
                 $string = substr($string, 2);
             }
-
-            return $string;
-
         }
 
         return $string;
