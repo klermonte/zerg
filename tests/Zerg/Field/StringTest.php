@@ -19,4 +19,11 @@ class StringTest extends \PHPUnit_Framework_TestCase
         $stream = new StringStream("\xff\xfeabc");
         $this->assertEquals('ab', $string->read($stream));
     }
+
+    public function testEmptyUtfString()
+    {
+        $string = new String(1, ['utf' => 1]);
+        $stream = new StringStream("abc");
+        $this->assertEquals('', $string->read($stream));
+    }
 }
