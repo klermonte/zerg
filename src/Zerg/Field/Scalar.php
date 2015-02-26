@@ -16,19 +16,6 @@ use Zerg\Stream\AbstractStream;
 abstract class Scalar extends AbstractField
 {
     /**
-     * @var array Human names of some common used sizes.
-     * */
-    private $sizes = [
-        'BIT'         => 1,
-        'SEMI_NIBBLE' => 2,
-        'NIBBLE'      => 4,
-        'BYTE'        => 8,
-        'SHORT'       => 16,
-        'WORD'        => 32,
-        'DWORD'       => 64,
-    ];
-
-    /**
      * @var int|string Size of field in bits/bytes or path to value in DataSet.
      * */
     protected $size;
@@ -44,22 +31,17 @@ abstract class Scalar extends AbstractField
     protected $valueCallback;
 
     /**
-     * Getter for the value callback.
-     * @return callable
-     */
-    public function getValueCallback()
-    {
-        return $this->valueCallback;
-    }
-
-    /**
-     * Setter for the value callback.
-     * @param mixed $valueCallback
-     */
-    public function setValueCallback($valueCallback)
-    {
-        $this->valueCallback = $valueCallback;
-    }
+     * @var array Human names of some common used sizes.
+     * */
+    private $sizes = [
+        'BIT'         => 1,
+        'SEMI_NIBBLE' => 2,
+        'NIBBLE'      => 4,
+        'BYTE'        => 8,
+        'SHORT'       => 16,
+        'WORD'        => 32,
+        'DWORD'       => 64,
+    ];
 
     /**
      * Read part of data from source and return value in necessary format.
@@ -78,6 +60,59 @@ abstract class Scalar extends AbstractField
     public function setMainParam($size)
     {
         $this->setSize($size);
+    }
+
+    /**
+     * Return final value of size.
+     *
+     * If size was set as DataSet path, it will be processed here.
+     * @return int Final value of size.
+     * @throw ConfigurationException If the value was less than zero.
+     */
+    public function getSize()
+    {
+        $this->resolveProperty('size');
+        $size = $this->getCallbackableProperty('size');
+
+        if ($size < 0) {
+            throw new ConfigurationException('Element size should not be less 0');
+        }
+
+        return $size;
+    }
+
+    /**
+     * Process and sets size.
+     *
+     * Size can be represented as a string containing on of size key words {@see $sizes}.
+     * Also you can set path to already parsed value in DataSet.
+     * @param int|string $size
+     */
+    public function setSize($size)
+    {
+        if ($parsed = $this->parseSizeWord($size)) {
+            $this->size = $parsed;
+        } else {
+            $this->size = $size;
+        }
+    }
+
+    /**
+     * Getter for the value callback.
+     * @return callable
+     */
+    public function getValueCallback()
+    {
+        return $this->valueCallback;
+    }
+
+    /**
+     * Setter for the value callback.
+     * @param mixed $valueCallback
+     */
+    public function setValueCallback($valueCallback)
+    {
+        $this->valueCallback = $valueCallback;
     }
 
     /**
@@ -104,41 +139,6 @@ abstract class Scalar extends AbstractField
             $value = call_user_func($this->valueCallback, $value);
         }
         return $value;
-    }
-
-    /**
-     * Process and sets size.
-     *
-     * Size can be represented as a string containing on of size key words {@see $sizes}.
-     * Also you can set path to already parsed value in DataSet.
-     * @param int|string $size
-     */
-    public function setSize($size)
-    {
-        if ($parsed = $this->parseSizeWord($size)) {
-            $this->size = $parsed;
-        } else {
-            $this->size = $size;
-        }
-    }
-
-    /**
-     * Return final value of size.
-     *
-     * If size was set as DataSet path, it will be processed here.
-     * @return int Final value of size.
-     * @throw ConfigurationException If the value was less than zero.
-     */
-    public function getSize()
-    {
-        $this->resolveProperty('size');
-        $size = $this->getCallbackableProperty('size');
-
-        if ($size < 0) {
-            throw new ConfigurationException('Element size should not be less 0');
-        }
-
-        return $size;
     }
 
     /**
