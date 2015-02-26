@@ -2,7 +2,6 @@
 
 namespace Zerg\Field;
 
-use Zerg\DataSet;
 use Zerg\Stream\AbstractStream;
 
 class Conditional extends AbstractField
