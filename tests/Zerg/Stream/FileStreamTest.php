@@ -11,7 +11,7 @@ class FileStreamTest extends \PHPUnit_Framework_TestCase
         $stream->skip(16);
         $this->assertEquals('a', $stream->getReader()->readString(1));
         $stream->skip(4);
-        $this->assertEquals('b', $stream->getReader()->readString(1));
         $this->assertEquals('c', $stream->getReader()->readString(1));
+        $this->assertEquals('d', $stream->getReader()->readString(1));
     }
 } 
