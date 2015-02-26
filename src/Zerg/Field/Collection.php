@@ -31,7 +31,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      * @param array $fieldArray
      * @throws ConfigurationException
      */
-    private function initFromArray($fieldArray = [])
+    private function initFromArray(array $fieldArray = [])
     {
         foreach ($fieldArray as $fieldName => $fieldParams) {
 
@@ -100,11 +100,6 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
         }
 
         return $this->dataSet;
-    }
-
-    public function write(AbstractStream $stream, $value)
-    {
-        // TODO: Implement write() method.
     }
 
     /**

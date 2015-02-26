@@ -20,7 +20,7 @@ class DataSet implements \ArrayAccess, \Iterator
     /**
      * @param array $data Data to be wrapped.
      */
-    public function __construct($data = [])
+    public function __construct(array $data = [])
     {
         $this->setData($data);
     }
@@ -39,7 +39,7 @@ class DataSet implements \ArrayAccess, \Iterator
      * Assign new data to DataSet
      * @param array $data Data to be wrapped by DataSet.
      */
-    public function setData($data)
+    public function setData(array $data)
     {
         $this->data = (array) $data;
     }
@@ -112,7 +112,7 @@ class DataSet implements \ArrayAccess, \Iterator
      * @param array $path Path in internal format.
      * @return mixed The found value. Returns null if the value cannot be found.
      */
-    public function getValueByPath($path)
+    public function getValueByPath(array $path)
     {
         $child = $this->data;
 
@@ -135,7 +135,7 @@ class DataSet implements \ArrayAccess, \Iterator
      * @param array $path A path in internal format.
      * @param mixed $value The value to assign.
      */
-    public function setValueByPath($path, $value)
+    public function setValueByPath(array $path, $value)
     {
         $endPart = array_pop($path);
         $child = & $this->data;

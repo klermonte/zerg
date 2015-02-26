@@ -6,7 +6,7 @@ use Zerg\Stream\AbstractStream;
 
 class Int extends Scalar
 {
-    protected $signed;
+    protected $signed = false;
 
     /**
      * @return mixed
@@ -28,41 +28,28 @@ class Int extends Scalar
     {
         $size = $this->getSize();
 
-        $raw = $stream->read($size);
-
         $value = null;
 
-        if ($size <= 8) {
-            $value = $this->signed
-                ? $this->int8($raw)
-                : $this->uInt8($raw);
-        } else {
-            throw new ConfigurationException('Integer longer 8 bits not implemented yet');
+        $methodName = 'read' . ($this->signed ? '' : 'U') . 'Int';
+
+        switch ($size) {
+            case 8:
+            case 16:
+            case 32:
+                $methodName .= $size;
+                $value = $stream->getReader()->$methodName();
+                break;
+
+            default:
+                if ($size <= 32) {
+                    $value = $this->signed
+                        ? $stream->getReader()->readBits($size)
+                        : $stream->getReader()->readUBits($size);
+                } else {
+                    throw new ConfigurationException('Int can not be larger 32 bits');
+                }
         }
 
         return $value;
-    }
-
-    private function int8($data)
-    {
-        $ord = $this->uInt8($data);
-        return ($ord > 127)
-            ? -$ord - 2 * (128 - $ord)
-            : $ord;
-    }
-
-    private function uInt8($data)
-    {
-        return ord($data);
-    }
-
-    /**
-     * @param AbstractStream $stream
-     * @param mixed $value
-     * @return bool
-     */
-    public function write(AbstractStream $stream, $value)
-    {
-        // TODO: Implement write() method.
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Zerg;
 
+use PhpBinaryReader\BinaryReader;
+use PhpBinaryReader\Endian;
 use Zerg\Field\Collection;
 use Zerg\Stream\StringStream;
 
@@ -90,14 +92,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new Collection(
             [
-                'a' => ['int', 4],
-                ['padding', 4],
+                'a' => ['int', 'byte'],
                 'b' => ['conditional', '/a', [
                     'fields' => [
                         0 => ['int', 8],
-                        3 => ['conditional', '/a', [
+                        49 => ['conditional', '/a', [
                             'fields' => [
-                                3 => ['string', 6]
+                                49 => ['string', 6]
                             ]
                         ]]
                     ],
@@ -126,7 +127,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                     ], [
                         'count' => '/a',
                         'countCallback' => function ($count) {
-                            return $count + 1;
+                            return $count - 45;
                         }
                     ]
                 ]
@@ -152,5 +153,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $dataSet->getData()['f'][3]['fc']);
         $this->assertCount(2, $dataSet->getData()['f'][3]['fc']['qwe3']);
         $this->assertEquals(2, strlen($dataSet->getData()['f'][3]['fc']['qwe3'][1]));
+    }
+
+    /**
+     * @expectedException \Zerg\Field\ConfigurationException
+     * */
+    public function testCreationException()
+    {
+        $collection = new Collection(['foo']);
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error
+     */
+    public function testCreationError()
+    {
+        $collection = new Collection('foo');
     }
 }
