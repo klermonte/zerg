@@ -133,7 +133,7 @@ abstract class Scalar extends AbstractField
      * @param mixed $value Read value.
      * @return mixed Processed value.
      */
-    public function format($value)
+    private function format($value)
     {
         if (is_callable($this->valueCallback)) {
             $value = call_user_func($this->valueCallback, $value);
@@ -147,7 +147,7 @@ abstract class Scalar extends AbstractField
      * @param $word
      * @return int
      */
-    public function parseSizeWord($word)
+    private function parseSizeWord($word)
     {
         $sizeWord = strtoupper(preg_replace('/([a-z])([A-Z])/', '$1_$2', $word));
         if (array_key_exists($sizeWord, $this->sizes)) {
