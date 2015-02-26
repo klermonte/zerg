@@ -165,7 +165,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \PHPUnit_Framework_Error
-     * @expectedExceptionMessage must be of the type array
      */
     public function testCreationError()
     {
