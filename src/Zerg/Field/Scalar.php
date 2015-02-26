@@ -57,7 +57,7 @@ abstract class Scalar extends AbstractField
      * Init field by it's size.
      * @param mixed $size
      */
-    public function setMainParam($size)
+    public function init($size)
     {
         $this->setSize($size);
     }

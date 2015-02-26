@@ -11,7 +11,7 @@ class Conditional extends AbstractField
     protected $fields = [];
     protected $default = null;
 
-    public function setMainParam($key)
+    public function init($key)
     {
         $this->key = $key;
     }

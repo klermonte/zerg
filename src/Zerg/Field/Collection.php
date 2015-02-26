@@ -12,7 +12,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     private $children = [];
 
-    public function setMainParam($schemaArray)
+    public function init($schemaArray)
     {
         $this->initFromArray($schemaArray);
     }

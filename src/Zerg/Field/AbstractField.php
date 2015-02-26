@@ -22,11 +22,11 @@ abstract class AbstractField
 
     public function __construct($mainParam, $properties = [])
     {
-        $this->setMainParam($mainParam);
+        $this->init($mainParam);
         $this->configure($properties);
     }
 
-    abstract public function setMainParam($mainParam);
+    abstract public function init($mainParam);
 
     abstract public function parse(AbstractStream $stream);
 
