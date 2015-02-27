@@ -41,7 +41,7 @@ abstract class AbstractField
      * Avery field has one main parameter, which it itself sets by init() {@see init()}
      * method. Others config values sets smarty by configure() {@see configure()} method.
      *
-     * @param mixed $mainParam This parameter processed by class implementation.
+     * @param int|string|array $mainParam This parameter processed by class implementation.
      * @param array $properties Array of class properties to be set.
      */
     public function __construct($mainParam, $properties = [])
@@ -57,7 +57,7 @@ abstract class AbstractField
      * Implementation classes should override this method to init itself
      * by given main parameter.
      *
-     * @param mixed $mainParam This parameter processed by class implementation.
+     * @param int|string|array $mainParam This parameter processed by class implementation.
      */
     abstract public function init($mainParam);
 
@@ -135,7 +135,7 @@ abstract class AbstractField
      * Size can be represented as a string containing on of size key words {@see $sizes}.
      * Also you can set path to already parsed value in DataSet.
      *
-     * @param mixed $count
+     * @param string|int $count
      * @return static For chaining.
      */
     public function setCount($count)
@@ -173,7 +173,7 @@ abstract class AbstractField
      * Otherwise already set value will be returned.
      *
      * @param string $name Property name.
-     * @return mixed Found or already set property value.
+     * @return int|string|array|null Found or already set property value.
      * @throws ConfigurationException On invalid property value or
      * if there is not DataSet while property is set as path string.
      */

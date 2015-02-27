@@ -73,7 +73,7 @@ class DataSet implements \ArrayAccess, \Iterator
      * Set a value in the current level.
      *
      * @param string|int $name The name of the value to add.
-     * @param mixed $value The value to add.
+     * @param string|int|array|null $value The value to add.
      */
     public function setValue($name, $value)
     {
@@ -95,7 +95,7 @@ class DataSet implements \ArrayAccess, \Iterator
      * Get a value by name from the current level.
      *
      * @param string|int $name The name of the value to retrieve.
-     * @return mixed The found value. Returns null if the value cannot be found.
+     * @return string|int|array|null The found value. Returns null if the value cannot be found.
      */
     public function getValue($name)
     {
@@ -117,7 +117,7 @@ class DataSet implements \ArrayAccess, \Iterator
      *
      * @see $currentPath
      * @param array $path Path in internal format.
-     * @return mixed The found value. Returns null if the value cannot be found.
+     * @return string|int|array|null The found value. Returns null if the value cannot be found.
      */
     public function getValueByPath(array $path)
     {
@@ -140,7 +140,7 @@ class DataSet implements \ArrayAccess, \Iterator
      *
      * @see $currentPath
      * @param array $path A path in internal format.
-     * @param mixed $value The value to assign.
+     * @param string|int|array|null $value The value to assign.
      */
     public function setValueByPath(array $path, $value)
     {

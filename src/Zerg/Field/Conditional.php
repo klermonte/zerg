@@ -13,7 +13,7 @@ use Zerg\Stream\AbstractStream;
 class Conditional extends AbstractField
 {
     /**
-     * @var mixed Key of selected declaration.
+     * @var int|string Key of selected declaration.
      */
     protected $key = null;
 
@@ -30,7 +30,7 @@ class Conditional extends AbstractField
     /**
      * Init field by key of needed declaration. Usually it is a DataSet path (back link)
      *
-     * @param mixed $key DataSet path of field stored needed key.
+     * @param int|string $key DataSet path of field stored needed key.
      */
     public function init($key)
     {

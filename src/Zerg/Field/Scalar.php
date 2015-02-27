@@ -52,14 +52,14 @@ abstract class Scalar extends AbstractField
      * type of value.
      *
      * @param AbstractStream $stream Stream from which read.
-     * @return mixed Value type depend by implementation.
+     * @return int|string|null Value type depend by implementation.
      */
     abstract public function read(AbstractStream $stream);
 
     /**
      * Init field by it's size.
      *
-     * @param mixed $size Size in bits/bytes or DataSet path.
+     * @param int|string $size Size in bits/bytes or DataSet path.
      */
     public function init($size)
     {
@@ -118,7 +118,7 @@ abstract class Scalar extends AbstractField
     /**
      * Setter for the value callback.
      *
-     * @param mixed $valueCallback
+     * @param callable $valueCallback
      */
     public function setValueCallback($valueCallback)
     {
@@ -140,7 +140,7 @@ abstract class Scalar extends AbstractField
     /**
      * Applies all value hooks to read value.
      *
-     * @param mixed $value Read value.
+     * @param int|string|null $value Read value.
      * @return mixed Processed value.
      */
     private function format($value)
