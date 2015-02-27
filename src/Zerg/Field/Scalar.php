@@ -11,28 +11,30 @@ use Zerg\Stream\AbstractStream;
  * Scalar field should have size {@see $size} which can be overridden by size callback {@see $sizeCallback}
  * and may have count {@see AbstractField::$size}. Also scalar return value can be overridden
  * by value callback {@see $valueCallback}
+ *
  * @since 0.1
- * */
+ * @package Zerg\Field
+ */
 abstract class Scalar extends AbstractField
 {
     /**
      * @var int|string Size of field in bits/bytes or path to value in DataSet.
-     * */
+     */
     protected $size;
 
     /**
      * @var callable Callback that changes size of the field.
-     * */
+     */
     protected $sizeCallback;
 
     /**
      * @var callable Callback that changes value of the field.
-     * */
+     */
     protected $valueCallback;
 
     /**
      * @var array Human names of some common used sizes.
-     * */
+     */
     private $sizes = [
         'BIT'         => 1,
         'SEMI_NIBBLE' => 2,
@@ -48,6 +50,7 @@ abstract class Scalar extends AbstractField
      *
      * This is abstract method, so each implementation should return it's own
      * type of value.
+     *
      * @param AbstractStream $stream Stream from which read.
      * @return mixed Value type depend by implementation.
      */
@@ -55,7 +58,8 @@ abstract class Scalar extends AbstractField
 
     /**
      * Init field by it's size.
-     * @param mixed $size
+     *
+     * @param mixed $size Size in bits/bytes or DataSet path.
      */
     public function init($size)
     {
@@ -66,8 +70,9 @@ abstract class Scalar extends AbstractField
      * Return final value of size.
      *
      * If size was set as DataSet path, it will be processed here.
+     *
      * @return int Final value of size.
-     * @throw ConfigurationException If the value was less than zero.
+     * @throws ConfigurationException If the value was less than zero.
      */
     public function getSize()
     {
@@ -86,7 +91,9 @@ abstract class Scalar extends AbstractField
      *
      * Size can be represented as a string containing on of size key words {@see $sizes}.
      * Also you can set path to already parsed value in DataSet.
-     * @param int|string $size
+     *
+     * @param int|string $size Size in bits/bytes or DataSet path.
+     * @return static For chaining.
      */
     public function setSize($size)
     {
@@ -95,10 +102,12 @@ abstract class Scalar extends AbstractField
         } else {
             $this->size = $size;
         }
+        return $this;
     }
 
     /**
      * Getter for the value callback.
+     *
      * @return callable
      */
     public function getValueCallback()
@@ -108,6 +117,7 @@ abstract class Scalar extends AbstractField
 
     /**
      * Setter for the value callback.
+     *
      * @param mixed $valueCallback
      */
     public function setValueCallback($valueCallback)

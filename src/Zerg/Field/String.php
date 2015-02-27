@@ -8,13 +8,15 @@ use Zerg\Stream\AbstractStream;
  * String represents string type data.
  *
  * Data, parsed by this type of field returns as it is in binary file.
+ *
  * @since 0.1
- * */
+ * @package Zerg\Field
+ */
 class String extends Scalar
 {
     /**
      * @var bool Whether returned string should process like UTF-8 encoded.
-     * */
+     */
     protected $utf;
 
     /**
