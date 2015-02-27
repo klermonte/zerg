@@ -58,6 +58,7 @@ abstract class AbstractField
      * by given main parameter.
      *
      * @param int|string|array $mainParam This parameter processed by class implementation.
+     * @return void
      */
     abstract public function init($mainParam);
 

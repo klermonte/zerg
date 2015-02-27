@@ -22,4 +22,4 @@ class StringStream extends AbstractStream
         $this->reader = new BinaryReader($string);
     }
 
-} 
+}

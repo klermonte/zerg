@@ -49,4 +49,4 @@ class Enum extends Int
 
         return $value;
     }
-} 
+}

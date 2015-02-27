@@ -243,4 +243,3 @@ class DataSet implements \ArrayAccess, \Iterator
         unset($this->data[$offset]);
     }
 }
-
