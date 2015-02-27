@@ -4,11 +4,31 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
+/**
+ * Enum field return one of given values depends on read value.
+ *
+ * @since 0.1
+ * @package Zerg\Field
+ */
 class Enum extends Int
 {
-    protected $values;
-    protected $default;
+    /**
+     * @var array Array of possible values. Keys should by integer.
+     */
+    protected $values = [];
 
+    /**
+     * @var mixed Default value, if no one of possible values are not relate to read value.
+     */
+    protected $default = null;
+
+    /**
+     * Read key from Stream, and return value by this key or default value.
+     *
+     * @param AbstractStream $stream Stream from which resolved field reads.
+     * @return mixed Value by read key or default value if present.
+     * @throw InvalidKeyException If read key is not exist and default value is not presented.
+     */
     public function read(AbstractStream $stream)
     {
         $key = parent::read($stream);
