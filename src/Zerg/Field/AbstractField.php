@@ -115,7 +115,7 @@ abstract class AbstractField
      * Return field repeat count.
      *
      * @return int Number of times that this field should be repeated.
-     * @throw ConfigurationException If processed value is less zero.
+     * @throws ConfigurationException If processed value is less zero.
      */
     public function getCount()
     {
@@ -174,7 +174,7 @@ abstract class AbstractField
      *
      * @param string $name Property name.
      * @return mixed Found or already set property value.
-     * @throw ConfigurationException On invalid property value or
+     * @throws ConfigurationException On invalid property value or
      * if there is not DataSet while property is set as path string.
      */
     protected function resolveProperty($name)
