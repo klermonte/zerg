@@ -26,7 +26,7 @@ class Enum extends Int
      * Read key from Stream, and return value by this key or default value.
      *
      * @param AbstractStream $stream Stream from which resolved field reads.
-     * @return mixed Value by read key or default value if present.
+     * @return object|integer|double|string|array|boolean|callable Value by read key or default value if present.
      * @throws InvalidKeyException If read key is not exist and default value is not presented.
      */
     public function read(AbstractStream $stream)

@@ -26,7 +26,7 @@ abstract class AbstractField
     protected $dataSet = null;
 
     /**
-     * @var int Number of times that field should be repeated.
+     * @var string|int Number of times that field should be repeated.
      */
     protected $count = 1;
 
