@@ -2,17 +2,31 @@
 
 namespace Zerg\Stream;
 
+/**
+ * AbstractStream represents any type of stream - an entity that wraps data source and
+ * encapsulates the read and write operations.
+ *
+ * @since 0.1
+ * @package Zerg\Stream
+ */
 abstract class AbstractStream
 {
     /**
-     * @var \PhpBinaryReader\BinaryReader
+     * @var \PhpBinaryReader\BinaryReader Object that reads data from file|memory stream.
      * */
     protected $reader;
 
+    /**
+     * Implementations should init reader itself by given value.
+     *
+     * @param string $path Value to init reader.
+     */
     abstract public function __construct($path);
 
     /**
-     * @return \PhpBinaryReader\BinaryReader
+     * Getter for $reader property.
+     *
+     * @return \PhpBinaryReader\BinaryReader Object that reads data from file|memory stream.
      */
     public function getReader()
     {
@@ -21,7 +35,9 @@ abstract class AbstractStream
 
 
     /**
-     * @param int $size Amount of bits to be skipped
+     * Move internal pointer by given amount of bits ahead without reading dta.
+     *
+     * @param int $size Amount of bits to be skipped.
      */
     public function skip($size)
     {
