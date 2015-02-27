@@ -4,20 +4,45 @@ namespace Zerg\Field;
 
 use Zerg\Stream\AbstractStream;
 
+/**
+ * Conditional field can represent one of other given field or field collection depending on value of related field.
+ *
+ * @since 0.1
+ * @package Zerg\Field
+ */
 class Conditional extends AbstractField
 {
+    /**
+     * @var mixed Key of selected declaration.
+     */
     protected $key = null;
+
+    /**
+     * @var array Array of possible declarations.
+     */
     protected $fields = [];
+
+    /**
+     * @var array|null Default declaration.
+     */
     protected $default = null;
 
+    /**
+     * Init field by key of needed declaration. Usually it is a DataSet path (back link)
+     *
+     * @param mixed $key DataSet path of field stored needed key.
+     */
     public function init($key)
     {
         $this->key = $key;
     }
 
     /**
-     * @param AbstractStream $stream
-     * @return mixed
+     * Resolve needed field instance and call it's parse method.
+     *
+     * @api
+     * @param AbstractStream $stream Stream from which resolved field reads.
+     * @return mixed Value returned by resolved field.
      */
     public function parse(AbstractStream $stream)
     {
@@ -30,8 +55,11 @@ class Conditional extends AbstractField
     }
 
     /**
-     * @return AbstractField
-     * @throws InvalidKeyException
+     * Resolve value by DataSet path, choose related declaration and return field instance.
+     *
+     * @return AbstractField Field instance created by chosen declaration.
+     * @throws InvalidKeyException If no one declaration is not related to resolved value and
+     * default declaration is not presented.
      */
     private function resolve()
     {
