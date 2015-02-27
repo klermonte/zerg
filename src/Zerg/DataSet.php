@@ -48,13 +48,13 @@ class DataSet implements \ArrayAccess, \Iterator
      */
     public function setData(array $data)
     {
-        $this->data = (array) $data;
+        $this->data = $data;
     }
 
     /**
      * Move into a level.
      *
-     * @param string $level The level to move into.
+     * @param string|int $level The level to move into.
      */
     public function push($level)
     {
@@ -72,8 +72,8 @@ class DataSet implements \ArrayAccess, \Iterator
     /**
      * Set a value in the current level.
      *
-     * @param string $name The name of the value to add.
-     * @param string $value The value to add.
+     * @param string|int $name The name of the value to add.
+     * @param mixed $value The value to add.
      */
     public function setValue($name, $value)
     {
@@ -94,7 +94,7 @@ class DataSet implements \ArrayAccess, \Iterator
     /**
      * Get a value by name from the current level.
      *
-     * @param string $name The name of the value to retrieve.
+     * @param string|int $name The name of the value to retrieve.
      * @return mixed The found value. Returns null if the value cannot be found.
      */
     public function getValue($name)
