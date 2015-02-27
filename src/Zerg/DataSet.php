@@ -2,6 +2,12 @@
 
 namespace Zerg;
 
+/**
+ * DataSet is wrapper to array of data, that cat search and paste data by it's path.
+ *
+ * @since 0.1
+ * @package Zerg
+ */
 class DataSet implements \ArrayAccess, \Iterator
 {
     /**
@@ -36,7 +42,8 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Assign new data to DataSet
+     * Assign new data to DataSet.
+     *
      * @param array $data Data to be wrapped by DataSet.
      */
     public function setData(array $data)
@@ -128,8 +135,8 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Assign a value by path within the DataSet instance.
-     * Overwrites any existing value.
+     * Assign a value by path within the DataSet instance,
+     * overwrites any existing value.
      *
      * @see $currentPath
      * @param array $path A path in internal format.
@@ -156,8 +163,8 @@ class DataSet implements \ArrayAccess, \Iterator
      * Transform human path to internal DataSet format.
      *
      * @see $currentPath
-     * @param string $path Path in human format ('/a/b' or 'a/../b')
-     * @return array Path in internal format
+     * @param string $path Path in human format ('/a/b' or 'a/../b').
+     * @return array Path in internal format.
      */
     public function parsePath($path)
     {
