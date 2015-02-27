@@ -5,50 +5,50 @@ namespace Zerg\Field;
 use Zerg\DataSet;
 use Zerg\Stream\AbstractStream;
 
+/**
+ * Class Collection compose other types of fields.
+ *
+ * This field return array of values, that are read from Stream by other types of fields.
+ *
+ * @since 0.1
+ * @package Zerg\Field
+ */
 class Collection extends AbstractField implements \ArrayAccess, \Iterator
 {
     /**
-     * @var AbstractField[]
+     * @var AbstractField[] List of children fields.
      */
     private $children = [];
 
+    /**
+     * Init field by array of field declarations.
+     *
+     * @param array $schemaArray Array of declarations.
+     */
     public function init($schemaArray)
     {
         $this->initFromArray($schemaArray);
     }
 
     /**
-     * @param $name
-     * @param AbstractField $child
+     * Add a new child node to children list.
+     *
+     * @param string $name The field name.
+     * @param AbstractField $child Field instance.
      */
-    public function setChild($name, AbstractField $child)
+    public function addChild($name, AbstractField $child)
     {
         $child->setParent($this);
         $this->children[$name] = $child;
     }
 
     /**
-     * @param array $fieldArray
-     * @throws ConfigurationException
+     * Recursively call parse method of all children and store values in associated DataSet.
+     *
+     * @api
+     * @param AbstractStream $stream Stream from which children read.
+     * @return DataSet DataSet instance filled by children fields values.
      */
-    private function initFromArray(array $fieldArray = [])
-    {
-        foreach ($fieldArray as $fieldName => $fieldParams) {
-
-            if (!is_array($fieldParams)) {
-                throw new ConfigurationException('Unknown element declaration');
-            }
-
-            $isAssoc = array_keys(array_keys($fieldParams)) !== array_keys($fieldParams);
-
-            if ($isAssoc || is_array(reset($fieldParams))) {
-                $fieldParams = ['collection', $fieldParams];
-            }
-
-            $this->setChild($fieldName, Factory::get($fieldParams));
-        }
-    }
-
     public function parse(AbstractStream $stream)
     {
         if (!$this->parent) {
@@ -103,9 +103,31 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Whether a offset exists
-     * @param mixed $offset An offset to check for
-     * @return boolean true on success or false on failure
+     * Recursively creates field instances form their declarations.
+     *
+     * @param array $fieldArray Array of declarations.
+     * @throws ConfigurationException If one of declarations are invalid.
+     */
+    private function initFromArray(array $fieldArray = [])
+    {
+        foreach ($fieldArray as $fieldName => $fieldParams) {
+
+            if (!is_array($fieldParams)) {
+                throw new ConfigurationException('Unknown element declaration');
+            }
+
+            $isAssoc = array_keys(array_keys($fieldParams)) !== array_keys($fieldParams);
+
+            if ($isAssoc || is_array(reset($fieldParams))) {
+                $fieldParams = ['collection', $fieldParams];
+            }
+
+            $this->addChild($fieldName, Factory::get($fieldParams));
+        }
+    }
+
+    /**
+     * @inheritdoc
      */
     public function offsetExists($offset)
     {
@@ -113,9 +135,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Return field instance by given offset
-     * @param mixed $offset The offset to retrieve
-     * @return AbstractField
+     * @inheritdoc
      */
     public function offsetGet($offset)
     {
@@ -123,10 +143,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * add field or sub schema by given offset
-     * @param mixed $offset The offset to assign the value to.
-     * @param AbstractField $value The value to set
-     * @return void
+     * @inheritdoc
      */
     public function offsetSet($offset, $value)
     {
@@ -134,9 +151,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Unset field by offset
-     * @param mixed $offset The offset to unset
-     * @return void
+     * @inheritdoc
      */
     public function offsetUnset($offset)
     {
@@ -144,8 +159,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Return the current element
-     * @return AbstractField
+     * @inheritdoc
      */
     public function current()
     {
@@ -153,8 +167,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Move forward to next element
-     * @return void Any returned value is ignored.
+     * @inheritdoc
      */
     public function next()
     {
@@ -162,8 +175,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Return the key of the current element
-     * @return mixed scalar on success, or null on failure.
+     * @inheritdoc
      */
     public function key()
     {
@@ -171,9 +183,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Checks if current position is valid
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     * @inheritdoc
      */
     public function valid()
     {
@@ -181,8 +191,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Rewind the Iterator to the first element
-     * @return void Any returned value is ignored.
+     * @inheritdoc
      */
     public function rewind()
     {
