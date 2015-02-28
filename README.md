@@ -3,7 +3,7 @@ zerg [![Build Status](https://travis-ci.org/klermonte/zerg.svg)](https://travis-
 
 Zerg is a small PHP tool that allow you simply parse structured binary files like lsdj memory dump file, jpeg encoded image or your custom binary format file.
 
-## Introdusion
+## Introdution
 If you are reading this, chances are you know exactly why you need to read binary files in PHP. So I will not explain to you that this is not a good idea. Nevertheless, I like you needed to do this is in PHP. That's why I create zerg project. During creation, I was inspired by following projects: [alexras/bread](https://github.com/alexras/bread) and [themainframe/php-binary](https://github.com/themainframe/php-binary).
 
 ## Installation 
