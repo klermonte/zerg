@@ -62,7 +62,7 @@ Element index | Function | Type | Value examples
 ------------- | -------- | ---- | ---------------
 0 | Field type | string | `'int', 'string', 'enum', 'padding', 'conditional', 'collection'`
 1 | Field init paramert | string or int | `'word'` or `32` for size, `'/header/packageSize'` for back link
-3 | Field properties | array | `['signed' => true]`, `['values' => 1 => 'one', 10 => 'ten']`
+3 | Field properties | array | `['signed' => true]`, `['values' => [1 => 'one', 10 => 'ten']]`
 
 ## Field types
 Type key | Init parameter | Description |Field properties
