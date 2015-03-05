@@ -163,12 +163,45 @@ class DataSet implements \ArrayAccess, \Iterator
      * Transform human path to internal DataSet format.
      *
      * @see $currentPath
-     * @param string $path Path in human format ('/a/b' or 'a/../b').
+     * @param string $path Path in human format ('/a/b' or 'a/../b' or './b/c').
      * @return array Path in internal format.
+     * @throws Field\ConfigurationException If path could not be parsed.
      */
     public function parsePath($path)
     {
-        return explode('/', trim($path, '/'));
+        $parts = explode('/', trim($path, '/'));
+
+        $pathArray = [];
+        if ($parts[0] == '.') {
+            $pathArray = $this->currentPath;
+            array_shift($parts);
+        }
+
+        foreach ($parts as $part) {
+            if ($part == '..') {
+                if (count($pathArray)) {
+                    array_pop($pathArray);
+                } else {
+                    throw new Field\ConfigurationException("Invalid path. To many '..', can't move higher root.");
+                }
+            } else {
+                $pathArray[] = $part;
+            }
+        }
+
+        return $pathArray;
+    }
+
+    /**
+     * Determines whether a given string is a DataSet path.
+     *
+     * @param string $string Tested string.
+     * @return bool Whether tested string is a DataSet path.
+     * @since 0.2
+     */
+    public static function isPath($string)
+    {
+        return strpos($string, '/') !== false;
     }
 
     /**

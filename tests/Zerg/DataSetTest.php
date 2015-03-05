@@ -114,4 +114,81 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
         $dataSet->setValueByPath(['level1', 'foo'], 'bar');
         $this->assertEquals('bar', $dataSet->getValueByPath(['level1', 'foo'], true));
     }
+
+    public function paths()
+    {
+        return [
+            [[], '/a/b/c', ['a', 'b', 'c']],
+            [[], 'a/b/c', ['a', 'b', 'c']],
+            [['e', 'f'], './a/b/c', ['e', 'f', 'a', 'b', 'c']],
+            [['a', 'b', 'c'], './../d/e', ['a', 'b', 'd', 'e']],
+            [['a', 'b', 'c'], './../../e', ['a', 'e']],
+        ];
+    }
+
+    public function invalidPaths()
+    {
+        return [
+            [[], '../../a'],
+            [[], './../a'],
+            [['e', 'f'], './../f/../../../a'],
+            [['a', 'b', 'c'], './../../../../a'],
+            [['a', 'b', 'c'], '/../a'],
+        ];
+    }
+
+    public function pathStrings()
+    {
+        return [
+            ['/a/b/c', true],
+            ['a/b/c', true],
+            ['./a/1/c', true],
+            ['./../d/4', true],
+            ['qwe', false],
+            ['20', false],
+            ['.qwe', false],
+            ['asdf.qwe', false],
+            ['asdf..qwe', false],
+            ['', false],
+            ['.', false],
+            ['..', false],
+            ['   ', false],
+        ];
+    }
+
+    /**
+     * @dataProvider paths
+     */
+    public function testParsePath($currentPath, $pathString, $path)
+    {
+        $dataSet = new DataSet();
+        foreach ($currentPath as $part) {
+            $dataSet->push($part);
+        }
+
+        $this->assertEquals($path, $dataSet->parsePath($pathString));
+    }
+
+    /**
+     * @dataProvider invalidPaths
+     * @expectedException \Zerg\Field\ConfigurationException
+     */
+    public function testParsePathException($currentPath, $pathString)
+    {
+        $dataSet = new DataSet();
+        foreach ($currentPath as $part) {
+            $dataSet->push($part);
+        }
+
+        $dataSet->parsePath($pathString);
+    }
+
+    /**
+     * @dataProvider pathStrings
+     */
+    public function testIsPath($path, $isPath)
+    {
+        $this->assertEquals($isPath, DataSet::isPath($path));
+    }
+
 }

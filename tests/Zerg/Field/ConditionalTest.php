@@ -76,13 +76,4 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $this->field->configure(['key' => '/a/y', 'default' => null]);
         $this->field->parse($this->stream);
     }
-
-    /**
-     * @expectedException \Zerg\Field\ConfigurationException
-     * */
-    public function testConfigException()
-    {
-        $this->field->configure(['key' => 'qwe']);
-        $this->field->parse($this->stream);
-    }
 }

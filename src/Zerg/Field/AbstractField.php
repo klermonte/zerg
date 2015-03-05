@@ -175,29 +175,27 @@ abstract class AbstractField
      *
      * @param string $name Property name.
      * @return int|string|array|null Found or already set property value.
-     * @throws ConfigurationException On invalid property value or
-     * if there is not DataSet while property is set as path string.
+     * @throws ConfigurationException If there is not DataSet while property is set as path string.
      */
     protected function resolveProperty($name)
     {
-        $propertyValue = $this->$name;
-        if (!is_numeric($propertyValue)) {
-            if (strpos($propertyValue, '/') !== false) {
-                if (($dataSet = $this->getDataSet()) instanceof DataSet) {
-                    while (strpos($propertyValue, '/') !== false) {
-                        $propertyValue = $dataSet->getValueByPath($dataSet->parsePath($this->$name));
-                        $this->$name = $propertyValue;
-                    }
-                } else {
-                    throw new ConfigurationException('DataSet required to get value by path');
-                }
+        if (DataSet::isPath($this->$name)) {
+            if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+                do {
+                    $this->$name = $dataSet->getValueByPath($dataSet->parsePath($this->$name));
+                } while (DataSet::isPath($this->$name));
             } else {
-                throw new ConfigurationException("'{$propertyValue}' is not valid {$name} value");
+                throw new ConfigurationException('DataSet required to get value by path');
+            }
+        } elseif ($this->mustBeOnlyInt($name)) {
+            if (is_numeric($this->$name)) {
+                $this->$name = (int) $this->$name;
+            } else {
+                throw new ConfigurationException("'{$this->$name}' is not valid {$name} value");
             }
         }
 
-
-        return $propertyValue;
+        return $this->$name;
     }
 
     /**
@@ -218,5 +216,17 @@ abstract class AbstractField
             $value = call_user_func($this->$callbackName, $value);
         }
         return $value;
+    }
+
+    /**
+     * Determines whether property should be only integer or not.
+     *
+     * @param string $name Tested property name.
+     * @return bool Whether property should be only integer.
+     * @since 0.2
+     */
+    private function mustBeOnlyInt($name)
+    {
+        return in_array($name, ['size', 'count']);
     }
 }

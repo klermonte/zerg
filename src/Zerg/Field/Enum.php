@@ -40,7 +40,7 @@ class Enum extends Int
             $value = $this->default;
         }
 
-        if (is_null($value)) {
+        if ($value === null) {
             throw new InvalidKeyException(
                 "Value '{$key}' does not correspond to a valid enum key. Presented keys: '" .
                 implode("', '", array_keys($values)) . "'"

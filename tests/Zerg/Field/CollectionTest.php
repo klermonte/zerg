@@ -1,10 +1,7 @@
 <?php
 
-namespace Zerg;
+namespace Zerg\Field;
 
-use PhpBinaryReader\BinaryReader;
-use PhpBinaryReader\Endian;
-use Zerg\Field\Collection;
 use Zerg\Stream\StringStream;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +16,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\\Zerg\\Field\\Int', $collection['a']);
         $this->assertInstanceOf('\\Zerg\\Field\\String', $collection['b']);
         $this->assertFalse(isset($collection['c']));
-        $collection['c'] = new Field\Int(1);
+        $collection['c'] = new Int(1);
         $this->assertInstanceOf('\\Zerg\\Field\\Int', $collection['c']);
         unset($collection['a']);
         $this->assertFalse(isset($collection['a']));
