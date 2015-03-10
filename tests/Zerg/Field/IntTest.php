@@ -92,7 +92,6 @@ class IntTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [-1],
-            ['qwerty'],
             ['/foo/bar']
         ];
     }

@@ -55,51 +55,21 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
             $this->dataSet = new DataSet;
         }
 
-        $dataSet = $this->dataSet;
         foreach ($this->children as $fieldName => $fieldObj) {
 
-            $fieldObj->setDataSet($dataSet);
+            $fieldObj->setDataSet($this->dataSet);
+            $fieldObj->saveToDataSet($fieldName, $stream);
 
-            if ($fieldObj instanceof self) {
-
-                $dataSet->push($fieldName);
-
-                if ($fieldObj->getCount() > 1) {
-
-                    for ($i = 0; $i < $fieldObj->getCount(); $i++) {
-                        $dataSet->push($i);
-                        $fieldObj->parse($stream);
-                        $dataSet->pop();
-                    }
-
-                } else {
-
-                    $fieldObj->parse($stream);
-                }
-
-                $dataSet->pop();
-
-            } else {
-
-                if ($fieldObj->getCount() > 1) {
-
-                    $dataSet->push($fieldName);
-                    for ($i = 0; $i < $fieldObj->getCount(); $i++) {
-                        $dataSet->setValue($i, $fieldObj->parse($stream));
-                    }
-                    $dataSet->pop();
-
-                } else {
-
-                    $value = $fieldObj->parse($stream);
-                    if ($value !== null) {
-                        $dataSet->setValue($fieldName, $value);
-                    }
-                }
-            }
         }
 
         return $this->dataSet;
+    }
+
+    protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
+    {
+        $this->dataSet->push($fieldName);
+        $this->parse($stream);
+        $this->dataSet->pop();
     }
 
     /**

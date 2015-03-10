@@ -195,13 +195,13 @@ class DataSet implements \ArrayAccess, \Iterator
     /**
      * Determines whether a given string is a DataSet path.
      *
-     * @param string $string Tested string.
+     * @param mixed $value Tested string.
      * @return bool Whether tested string is a DataSet path.
      * @since 0.2
      */
-    public static function isPath($string)
+    public static function isPath($value)
     {
-        return strpos($string, '/') !== false;
+        return !is_array($value) && strpos($value, '/') !== false;
     }
 
     /**

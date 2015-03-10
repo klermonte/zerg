@@ -115,19 +115,27 @@ abstract class AbstractField
     /**
      * Return field repeat count.
      *
-     * @return int Number of times that this field should be repeated.
-     * @throws ConfigurationException If processed value is less zero.
+     * @return int|array Number of times that this field should be repeated.
+     * Or array of numbers for multidimensional repeats.
+     * @throws ConfigurationException If one of processed values is less zero.
      */
     public function getCount()
     {
         $this->resolveProperty('count');
-        $count = (int) $this->getCallbackableProperty('count');
+        $count = $this->getCallbackableProperty('count');
 
-        if ($count < 0) {
-            throw new ConfigurationException('Field count should not be less 0');
+        if (!is_array($count)) {
+            $count = [$count];
         }
 
-        return $count;
+        foreach ($count as $key => $subCount) {
+            $count[$key] = (int) $subCount;
+            if ($count[$key] < 0) {
+                throw new ConfigurationException('Field count should not be less 0');
+            }
+        }
+
+        return count($count) > 1 ? $count : reset($count);
     }
 
     /**
@@ -167,6 +175,47 @@ abstract class AbstractField
         return $this;
     }
 
+    protected function saveToDataSet($fieldName, AbstractStream $stream)
+    {
+        $count = $this->getCount();
+
+        if (empty($count) || $count == 1) {
+            $this->saveToDataSetOnce($fieldName, $stream);
+        } else {
+            $this->saveToDataSetByCount($fieldName, $stream, $count);
+        }
+    }
+
+    protected function saveToDataSetByCount($fieldName, AbstractStream $stream, $count)
+    {
+        $this->dataSet->push($fieldName);
+
+        if (!is_array($count)) {
+            $count = [$count];
+        }
+
+        $countPart = array_shift($count);
+
+        for ($i = 0; $i < $countPart; $i++) {
+            if (empty($count)) {
+                $this->saveToDataSetOnce($i, $stream);
+            } else {
+                $this->saveToDataSetByCount($i, $stream, $count);
+            }
+        }
+
+        $this->dataSet->pop();
+
+    }
+
+    protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
+    {
+        $value = $this->parse($stream);
+        if ($value !== null) {
+            $this->dataSet->setValue($fieldName, $value);
+        }
+    }
+
     /**
      * Process, set and return given property.
      *
@@ -175,27 +224,35 @@ abstract class AbstractField
      *
      * @param string $name Property name.
      * @return int|string|array|null Found or already set property value.
-     * @throws ConfigurationException If there is not DataSet while property is set as path string.
      */
     protected function resolveProperty($name)
     {
-        if (DataSet::isPath($this->$name)) {
-            if (($dataSet = $this->getDataSet()) instanceof DataSet) {
-                do {
-                    $this->$name = $dataSet->getValueByPath($dataSet->parsePath($this->$name));
-                } while (DataSet::isPath($this->$name));
-            } else {
-                throw new ConfigurationException('DataSet required to get value by path');
-            }
-        } elseif ($this->mustBeOnlyInt($name)) {
-            if (is_numeric($this->$name)) {
-                $this->$name = (int) $this->$name;
-            } else {
-                throw new ConfigurationException("'{$this->$name}' is not valid {$name} value");
+        $value = $this->resolveValue($this->$name);
+        $this->$name = $value;
+        return $value;
+    }
+
+    /**
+     * Find value in DataSet by given value if it is a path string.
+     * Otherwise given value will be returned.
+     *
+     * @param $value
+     * @return array|int|null|string
+     * @since 0.2
+     */
+    protected function resolveValue($value)
+    {
+        if (DataSet::isPath($value)) {
+            $value = $this->resolvePath($value);
+        }
+
+        if (is_array($value)) {
+            foreach ($value as $key => $subValue) {
+                $value[$key] = $this->resolveValue($subValue);
             }
         }
 
-        return $this->$name;
+        return $value;
     }
 
     /**
@@ -211,22 +268,36 @@ abstract class AbstractField
     protected function getCallbackableProperty($name)
     {
         $callbackName = strtolower($name) . 'Callback';
-        $value = $this->$name;
-        if (is_callable($this->$callbackName)) {
-            $value = call_user_func($this->$callbackName, $value);
+        $values = $this->$name;
+        if (!is_array($values)) {
+            $values = [$values];
         }
-        return $value;
+        if (is_callable($this->$callbackName)) {
+            foreach ($values as $key => $value) {
+                $values[$key] = call_user_func($this->$callbackName, $value);
+            }
+        }
+        return count($values) > 1 ? $values : reset($values);
     }
 
     /**
-     * Determines whether property should be only integer or not.
+     * Find value by given path in associated DataSet.
      *
-     * @param string $name Tested property name.
-     * @return bool Whether property should be only integer.
+     * @param string $value Value path.
+     * @return array|int|null|string
+     * @throws ConfigurationException If there is not DataSet while property is set as path string.
      * @since 0.2
      */
-    private function mustBeOnlyInt($name)
+    protected function resolvePath($value)
     {
-        return in_array($name, ['size', 'count']);
+        if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+            do {
+                $value = $dataSet->getValueByPath($dataSet->parsePath($value));
+            } while (DataSet::isPath($value));
+        } else {
+            throw new ConfigurationException('DataSet required to get value by path');
+        }
+
+        return $value;
     }
 }
