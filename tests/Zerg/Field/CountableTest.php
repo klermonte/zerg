@@ -55,6 +55,22 @@ class CountableTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $dataSet['header'][1]);
     }
 
+    public function testNestedBackLinkedCount()
+    {
+        $field = new Collection([
+            'count' => ['string', 1],
+            'header' => ['string', 1, ['count' => [2, '/count']]]
+        ]);
+
+        $stream = new StringStream('3qweqweqweqweqweqwe');
+
+        $dataSet = $field->parse($stream);
+
+        $this->assertCount(2, $dataSet['header']);
+        $this->assertCount(3, $dataSet['header'][0]);
+        $this->assertCount(3, $dataSet['header'][1]);
+    }
+
     public function testNestedCollectionCount()
     {
         $field = new Collection([
