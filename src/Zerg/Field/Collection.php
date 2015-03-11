@@ -51,7 +51,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function parse(AbstractStream $stream)
     {
-        if (!$this->parent) {
+        if ($this->dataSet == null) {
             $this->dataSet = new DataSet;
         }
 

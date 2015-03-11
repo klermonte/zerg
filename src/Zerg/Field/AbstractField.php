@@ -290,9 +290,9 @@ abstract class AbstractField
      */
     protected function resolvePath($value)
     {
-        if (($dataSet = $this->getDataSet()) instanceof DataSet) {
+        if ($this->dataSet !== null) {
             do {
-                $value = $dataSet->getValueByPath($dataSet->parsePath($value));
+                $value = $this->dataSet->getValueByPath($this->dataSet->parsePath($value));
             } while (DataSet::isPath($value));
         } else {
             throw new ConfigurationException('DataSet required to get value by path');
