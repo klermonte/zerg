@@ -211,7 +211,7 @@ abstract class AbstractField
     protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
     {
         $value = $this->parse($stream);
-        if ($value !== null) {
+        if ($value !== null && !($value instanceof DataSet)) {
             $this->dataSet->setValue($fieldName, $value);
         }
     }
