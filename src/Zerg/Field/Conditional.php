@@ -18,17 +18,17 @@ class Conditional extends AbstractField
     protected $key = null;
 
     /**
-     * @var array Array of possible declarations.
+     * @var array|AbstractField[] Array of possible declarations.
      */
     protected $fields = [];
 
     /**
-     * @var array|null Default declaration.
+     * @var array|null|AbstractField Default declaration.
      */
     protected $default = null;
 
     /**
-     * Init field by key of needed declaration. Usually it is a DataSet path (back link)
+     * Init field by key of needed declaration. Usually it is a DataSet path (back link).
      *
      * @param int|string $key DataSet path of field stored needed key.
      */
@@ -65,7 +65,7 @@ class Conditional extends AbstractField
     {
         $key = $this->resolveProperty('key');
 
-        if (array_key_exists($key, $this->fields)) {
+        if (isset($this->fields[$key])) {
             $field = $this->fields[$key];
         } elseif ($this->default !== null) {
             $field = $this->default;
@@ -76,6 +76,11 @@ class Conditional extends AbstractField
             );
         }
 
+        // get form cache
+        if ($field instanceof AbstractField) {
+            return $field;
+        }
+
         $isAssoc = array_keys(array_keys($field)) !== array_keys($field);
 
         if ($isAssoc || is_array(reset($field))) {
@@ -84,6 +89,13 @@ class Conditional extends AbstractField
 
         $field = Factory::get($field);
         $field->setDataSet($this->getDataSet());
+
+        // cache field instance
+        if (isset($this->fields[$key])) {
+            $this->fields[$key] = $field;
+        } else {
+            $this->default = $field;
+        }
 
         return $field;
     }
