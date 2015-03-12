@@ -121,8 +121,7 @@ abstract class AbstractField
      */
     public function getCount()
     {
-        $this->resolveProperty('count');
-        $count = $this->getCallbackableProperty('count');
+        $count = $this->getCallbackableProperty('count', $this->resolveProperty('count'));
 
         if (!is_array($count)) {
             $count = [$count];
@@ -227,8 +226,11 @@ abstract class AbstractField
      */
     protected function resolveProperty($name)
     {
-        $value = $this->resolveValue($this->$name);
-        $this->$name = $value;
+        $value = $this->resolveValue($this->$name, $canBeCached);
+        if ($canBeCached) {
+            $this->$name = $value;
+        }
+
         return $value;
     }
 
@@ -237,18 +239,25 @@ abstract class AbstractField
      * Otherwise given value will be returned.
      *
      * @param $value
+     * @param $canBeCached
      * @return array|int|null|string
      * @since 0.2
      */
-    protected function resolveValue($value)
+    protected function resolveValue($value, &$canBeCached = true)
     {
         if (DataSet::isPath($value)) {
+            if (!DataSet::isAbsolutePath($value)) {
+                $canBeCached = false;
+            }
             $value = $this->resolvePath($value);
         }
 
         if (is_array($value)) {
             foreach ($value as $key => $subValue) {
-                $value[$key] = $this->resolveValue($subValue);
+                $value[$key] = $this->resolveValue($subValue, $canBeCachedSubValue);
+                if ($canBeCached && !$canBeCachedSubValue) {
+                    $canBeCached = false;
+                }
             }
         }
 
@@ -263,12 +272,19 @@ abstract class AbstractField
      * property value will be returned.
      *
      * @param string $name Property name.
+     * @param mixed $currentValue
      * @return mixed Processed or already set property value.
      */
-    protected function getCallbackableProperty($name)
+    protected function getCallbackableProperty($name, $currentValue = null)
     {
         $callbackName = strtolower($name) . 'Callback';
-        $values = $this->$name;
+
+        if ($currentValue !== null) {
+            $values = $currentValue;
+        } else {
+            $values = $this->$name;
+        }
+
         if (!is_array($values)) {
             $values = [$values];
         }
