@@ -108,19 +108,19 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                     'd' => ['int', 8, ['signed' => true]],
                     'd2' => ['int', 8, ['signed' => true]],
                 ],
-                'e' => ['string', 10, ['count' => 16]],
+                'e' => ['string', 80, ['count' => 16]],
                 'f' => [
                     'collection', [
-                        'fa' => ['string', 2, ['count' => 5]],
+                        'fa' => ['string', 16, ['count' => 5]],
                         'fc' => [
                             'qwe1' => ['int', 8],
                             'qwe2' => ['int', 8],
                             'qwe3' => [
-                                ['string', 2],
-                                ['string', 2],
+                                ['string', 16],
+                                ['string', 16],
                             ]
                         ],
-                        'fb' => ['string', 2, ['utf' => true]]
+                        'fb' => ['string', 16, ['utf' => true]]
                     ], [
                         'count' => '/a',
                         'countCallback' => function ($count) {

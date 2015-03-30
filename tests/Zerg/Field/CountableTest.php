@@ -58,8 +58,8 @@ class CountableTest extends \PHPUnit_Framework_TestCase
     public function testNestedBackLinkedCount()
     {
         $field = new Collection([
-            'count' => ['string', 1],
-            'header' => ['string', 1, ['count' => [2, '/count']]]
+            'count' => ['string', 8],
+            'header' => ['string', 8, ['count' => [2, '/count']]]
         ]);
 
         $stream = new StringStream('3qweqweqweqweqweqwe');

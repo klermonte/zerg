@@ -16,12 +16,12 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
             'fields' => [
                 1 => [
                     'wqe' => ['int', 8],
-                    'asd' => ['string', 2]
+                    'asd' => ['string', 16]
                 ],
                 5 => ['int', 8],
                 10 => ['conditional', '/a', [
                     'fields' => [
-                        1 => ['string', 6]
+                        1 => ['string', 48]
                     ]
                 ]]
             ],

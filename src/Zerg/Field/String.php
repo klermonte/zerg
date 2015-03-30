@@ -27,9 +27,7 @@ class String extends Scalar
      */
     public function read(AbstractStream $stream)
     {
-        $string = $stream->getReader()
-            ->setCurrentBit(0)
-            ->readString($this->getSize());
+        $string = $stream->getReader()->read($this->getSize());
 
         if ($this->utf) {
 
