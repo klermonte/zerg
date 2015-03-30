@@ -87,31 +87,34 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
     public function testParse()
     {
-        $collection = new Collection(
-            [
-                'a' => ['int', 'byte'],
-                'b' => ['conditional', '/a', [
-                    'fields' => [
-                        0 => ['int', 8],
-                        49 => ['conditional', '/a', [
-                            'fields' => [
-                                49 => ['string', 6]
-                            ]
-                        ]]
-                    ],
-                    'default' => [
-                        ['int', 8],
-                        ['int', 8]
-                    ]
-                ]],
-                'c' => [
-                    'd' => ['int', 8, ['signed' => true]],
-                    'd2' => ['int', 8, ['signed' => true]],
+        $collection = new Collection([
+            'a' => ['int', 'byte'],
+            'b' => ['conditional', '/a', [
+                'fields' => [
+                    0 => ['int', 8],
+                    49 => ['conditional', '/a', [
+                        'fields' => [
+                            49 => ['string', 6]
+                        ]
+                    ]]
                 ],
-                'e' => ['string', 80, ['count' => 16]],
-                'f' => [
-                    'collection', [
-                        'fa' => ['string', 16, ['count' => 5]],
+                'default' => [
+                    ['int', 8],
+                    ['int', 8]
+                ]
+            ]],
+            'c' => [
+                'd' => ['int', 8, ['signed' => true]],
+                'd2' => ['int', 8, ['signed' => true]],
+            ],
+            'e' => ['arr', 16, ['field' => ['string', 80]]],
+            'f' => [
+                'arr', '/a', [
+                    'countCallback' => function ($count) {
+                        return $count - 45;
+                    },
+                    'field' => [
+                        'fa' => ['arr', 5, ['field' => ['string', 16]]],
                         'fc' => [
                             'qwe1' => ['int', 8],
                             'qwe2' => ['int', 8],
@@ -121,13 +124,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                             ]
                         ],
                         'fb' => ['string', 16, ['utf' => true]]
-                    ], [
-                        'count' => '/a',
-                        'countCallback' => function ($count) {
-                            return $count - 45;
-                        }
                     ]
                 ]
+            ],
         ]);
 
         $stream = new StringStream('1sadfasdfhf3qurht3094h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfad

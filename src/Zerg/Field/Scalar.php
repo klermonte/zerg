@@ -59,7 +59,7 @@ abstract class Scalar extends AbstractField
     /**
      * Init field by it's size.
      *
-     * @param int|string $size Size in bits/bytes or DataSet path.
+     * @param int|string $size Size in bits or DataSet path.
      */
     public function init($size)
     {
