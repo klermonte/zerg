@@ -18,6 +18,20 @@ class Int extends Scalar
     protected $signed = false;
 
     /**
+     * Init int signed.
+     *
+     * @param array $options
+     * @return void
+     */
+    public function init(array $options)
+    {
+        parent::init($options);
+        if (isset($options['signed'])) {
+            $this->setSigned($options['signed']);
+        }
+    }
+
+    /**
      * Getter for signed property.
      *
      * @return bool
@@ -45,6 +59,6 @@ class Int extends Scalar
      */
     public function read(AbstractStream $stream)
     {
-        return $stream->getReader()->readInt($this->getSize(), $this->signed);
+        return $stream->getBuffer()->readInt($this->getSize(), $this->signed);
     }
 }

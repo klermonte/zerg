@@ -38,7 +38,7 @@ class IntTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0xdc, (new Int('byte'))->read($stream));
 
         $int->setSize('semi_nibble');
-        $stream->getReader()->setPosition(0);
+        $stream->getBuffer()->setPosition(0);
 
         $values = [1,3,0,3,3,1,2,2,3,3,1,0];
         foreach ($values as $expected) {

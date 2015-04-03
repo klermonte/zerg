@@ -217,6 +217,22 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
+     * Recursively find value by path.
+     *
+     * @param string $value Value path.
+     * @return array|int|null|string
+     * @since 1.0
+     */
+    public function resolvePath($value)
+    {
+        do {
+            $value = $this->getValueByPath($this->parsePath($value));
+        } while (self::isPath($value));
+
+        return $value;
+    }
+
+    /**
      * @inheritdoc
      * */
     public function current()

@@ -19,7 +19,7 @@ class StringStream extends AbstractStream
      */
     public function __construct($string)
     {
-        $this->reader = new BitBuffer($string);
+        $this->buffer = new BitBuffer($string);
     }
 
 }

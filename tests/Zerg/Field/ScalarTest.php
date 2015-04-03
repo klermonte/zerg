@@ -14,11 +14,11 @@ class ScalarTest extends \PHPUnit_Framework_TestCase
 
         $field = new Int('byte', [
             'signed' => true,
-            'valueCallback' => $callback
+            'formatter' => $callback
         ]);
 
         $this->assertSame(8, $field->getSize());
-        $this->assertSame($callback, $field->getValueCallback());
+        $this->assertSame($callback, $field->getFormatter());
         $this->assertTrue($field->getSigned());
     }
 
@@ -26,7 +26,7 @@ class ScalarTest extends \PHPUnit_Framework_TestCase
     {
         $stream = new StringStream('123abcdefgqwertyahnytjssdadfkjhb');
         $field = new Int('byte', [
-            'valueCallback' => function($value) {
+            'formatter' => function($value) {
                 return $value - 2 * 8;
             }
         ]);

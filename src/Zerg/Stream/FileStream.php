@@ -20,6 +20,6 @@ class FileStream extends AbstractStream
     public function __construct($path)
     {
         $handle = fopen($path, 'rb');
-        $this->reader = new BitBuffer($handle);
+        $this->buffer = new BitBuffer($handle);
     }
 }
