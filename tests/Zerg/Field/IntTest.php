@@ -65,19 +65,9 @@ class IntTest extends \PHPUnit_Framework_TestCase
     public function testInvalidOptionSize($invalidValue)
     {
         $int = new Int($invalidValue);
-        $seze = $int->getSize();
+        $int->getSize();
     }
 
-
-    /**
-     * @expectedException \Zerg\Field\ConfigurationException
-     * @dataProvider invalidValues
-     * */
-    public function testInvalidOptionCount($invalidValue)
-    {
-        $int = new Int('byte', ['count' => $invalidValue]);
-        $count = $int->getCount();
-    }
 
     /**
      * @expectedException \LengthException

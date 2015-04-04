@@ -47,11 +47,9 @@ class SizeableTest extends \PHPUnit_Framework_TestCase
 
     public function testSizeCallback()
     {
-        $field = new Int(8, [
-            'sizeCallback' => function($length) {
-                return $length - 2;
-            }
-        ]);
+        $field = new Int(function() {
+            return 6;
+        });
 
         $this->assertEquals(6, $field->getSize());
     }

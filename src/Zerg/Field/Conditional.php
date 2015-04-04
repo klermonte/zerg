@@ -15,26 +15,23 @@ class Conditional extends AbstractField
     /**
      * @var int|string Key of selected declaration.
      */
-    protected $key = null;
+    protected $key;
 
     /**
      * @var array|AbstractField[] Array of possible declarations.
      */
-    protected $fields = [];
+    protected $fields;
 
     /**
      * @var array|null|AbstractField Default declaration.
      */
-    protected $default = null;
+    protected $default;
 
-    /**
-     * Init field by key of needed declaration. Usually it is a DataSet path (back link).
-     *
-     * @param int|string $key DataSet path of field stored needed key.
-     */
-    public function init($key)
+    public function __construct($key, array $fields, $options = [])
     {
-        $this->key = $key;
+        $this->setKey($key);
+        $this->setFields($fields);
+        $this->configure($options);
     }
 
     /**
@@ -81,12 +78,6 @@ class Conditional extends AbstractField
             return $field;
         }
 
-        $isAssoc = array_keys(array_keys($field)) !== array_keys($field);
-
-        if ($isAssoc || is_array(reset($field))) {
-            $field = ['collection', $field];
-        }
-
         $field = Factory::get($field);
         $field->setDataSet($this->getDataSet());
 
@@ -98,5 +89,29 @@ class Conditional extends AbstractField
         }
 
         return $field;
+    }
+
+    /**
+     * @param int|string $key
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+    }
+
+    /**
+     * @param array|null|AbstractField $default
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
+    }
+
+    /**
+     * @param array|AbstractField[] $fields
+     */
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
     }
 }

@@ -3,9 +3,7 @@
 namespace Zerg\Field;
 
 
-use Zerg\Stream\AbstractStream;
-
-class Arr extends AbstractField
+class Arr extends Collection
 {
     /**
      * @var int Count of elements.
@@ -18,50 +16,21 @@ class Arr extends AbstractField
     protected $until;
 
     /**
-     * @var AbstractField Field to be repeated.
+     * @var array|AbstractField Field to be repeated.
      */
     protected $field;
 
     /**
-     * Init array field by required properties.
-     *
-     * @param array $properties Field properties array.
-     * @return void
+     * @var int
      */
-    public function init($properties)
+    protected $index;
+
+    public function __construct($count, $field, $options = [])
     {
-        parent::init($properties);
-
-        if (isset($properties['field'])) {
-            $this->setField($properties['field']);
-        } else {
-            throw new ConfigurationException('Array field must be configured by field property');
-        }
-
-        if (isset($properties['until'])) {
-            $this->setUntil($properties['until']);
-        } elseif (isset($properties['count'])) {
-            $this->setCount($properties['count']);
-        } else {
-            throw new ConfigurationException('Array field must be configured by either count or until property');
-        }
-    }
-
-    /**
-     * Read and process data from Stream.
-     *
-     * @api
-     * @param AbstractStream $stream Stream from which field should read.
-     * @return array Array of values.
-     */
-    public function parse(AbstractStream $stream)
-    {
-        $value = [];
-        $field = $this->getField();
-        for ($i = 0; $i < $this->getCount(); $i ++) {
-            $value[$i] = $field->parse($stream);
-        }
-        return $value;
+        $this->setCount($count);
+        $this->setField($field);
+        $this->index = 0;
+        $this->configure($options);
     }
 
     /**
@@ -108,18 +77,61 @@ class Arr extends AbstractField
         $field = $this->resolveProperty('field');
         if (is_array($field)) {
             $field = Factory::get($field);
-            $field->setDataSet($this->dataSet);
         }
         return $field;
     }
 
     /**
-     * @param AbstractField $field
+     * @param array|AbstractField $field
      * @return $this
      */
     public function setField($field)
     {
+        if (is_array($field)) {
+            $field = Factory::get($field);
+        }
         $this->field = $field;
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     * @return AbstractField
+     */
+    public function current()
+    {
+        return $this->getField();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function next()
+    {
+        $this->index++;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function key()
+    {
+        return $this->index;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function valid()
+    {
+        return $this->index < $this->getCount();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rewind()
+    {
+        $this->index = 0;
     }
 }

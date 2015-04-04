@@ -9,12 +9,11 @@ class EnumTest extends \PHPUnit_Framework_TestCase
     public function testRead()
     {
         $field = new Enum(8, [
-            'values' => [
                 49 => 'right',
                 32 => 'wrong',
             ],
-            'default' => 'default'
-        ]);
+            ['default' => 'default']
+        );
 
         $stream = new StringStream('123abcdefg');
 
@@ -29,10 +28,8 @@ class EnumTest extends \PHPUnit_Framework_TestCase
     public function testKeyException()
     {
         $field = new Enum(8, [
-            'values' => [
-                49 => 'right',
-                32 => 'wrong',
-            ]
+            49 => 'right',
+            32 => 'wrong',
         ]);
 
         $stream = new StringStream('223abcdefg');

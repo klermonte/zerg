@@ -116,11 +116,15 @@ class DataSet implements \ArrayAccess, \Iterator
      * Find a value by path within the DataSet instance.
      *
      * @see $currentPath
-     * @param array $path Path in internal format.
+     * @param string|array $path Path in internal or human format.
      * @return string|int|array|null The found value. Returns null if the value cannot be found.
      */
-    public function getValueByPath(array $path)
+    public function getValueByPath($path)
     {
+        if (is_string($path)) {
+            $path = $this->parsePath($path);
+        }
+
         $child = $this->data;
 
         foreach ($path as $part) {
@@ -139,11 +143,15 @@ class DataSet implements \ArrayAccess, \Iterator
      * overwrites any existing value.
      *
      * @see $currentPath
-     * @param array $path A path in internal format.
+     * @param string|array $path A path in internal or human format.
      * @param string|int|array|null $value The value to assign.
      */
-    public function setValueByPath(array $path, $value)
+    public function setValueByPath($path, $value)
     {
+        if (is_string($path)) {
+            $path = $this->parsePath($path);
+        }
+
         $endPart = array_pop($path);
         $child = & $this->data;
 
@@ -201,7 +209,7 @@ class DataSet implements \ArrayAccess, \Iterator
      */
     public static function isPath($value)
     {
-        return !is_array($value) && strpos($value, '/') !== false;
+        return is_string($value) && strpos($value, '/') !== false;
     }
 
     /**
@@ -226,7 +234,7 @@ class DataSet implements \ArrayAccess, \Iterator
     public function resolvePath($value)
     {
         do {
-            $value = $this->getValueByPath($this->parsePath($value));
+            $value = $this->getValueByPath($value);
         } while (self::isPath($value));
 
         return $value;

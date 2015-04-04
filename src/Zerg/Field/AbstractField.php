@@ -39,30 +39,13 @@ abstract class AbstractField
      */
     abstract public function parse(AbstractStream $stream);
 
-    /**
-     * Initialize field instance.
-     *
-     * Avery field has config values, which field itself sets by init() {@see init()}
-     * method.
-     *
-     * @param array $properties Array of class properties to be set.
-     */
-    public function __construct(array $properties = [])
+    public function configure(array $properties)
     {
-        $this->init($properties);
-    }
-
-    /**
-     * Implementation classes should override this method to init itself
-     * by given properties array.
-     *
-     * @param array $properties Field properties array.
-     * @return void
-     */
-    public function init(array $properties)
-    {
-        if (isset($properties['assert'])) {
-            $this->setAssert($properties['assert']);
+        foreach ($properties as $name => $value) {
+            $methodName = 'set' . ucfirst(strtolower($name));
+            if (method_exists($this, $methodName) && $this->$name === null) {
+                $this->$methodName($value);
+            }
         }
     }
 
@@ -106,47 +89,6 @@ abstract class AbstractField
         return $this;
     }
 
-    /*    protected function saveToDataSet($fieldName, AbstractStream $stream)
-        {
-            $count = $this->getCount();
-
-            if (empty($count) || $count == 1) {
-                $this->saveToDataSetOnce($fieldName, $stream);
-            } else {
-                $this->saveToDataSetByCount($fieldName, $stream, $count);
-            }
-        }
-
-        protected function saveToDataSetByCount($fieldName, AbstractStream $stream, $count)
-        {
-            $this->dataSet->push($fieldName);
-
-            if (!is_array($count)) {
-                $count = [$count];
-            }
-
-            $countPart = array_shift($count);
-
-            for ($i = 0; $i < $countPart; $i++) {
-                if (empty($count)) {
-                    $this->saveToDataSetOnce($i, $stream);
-                } else {
-                    $this->saveToDataSetByCount($i, $stream, $count);
-                }
-            }
-
-            $this->dataSet->pop();
-
-        }
-
-        protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
-        {
-            $value = $this->parse($stream);
-            if ($value !== null && !($value instanceof DataSet)) {
-                $this->dataSet->setValue($fieldName, $value);
-            }
-        }*/
-
     /**
      * Process, set and return given property.
      *
@@ -164,7 +106,7 @@ abstract class AbstractField
 
         $value = $this->$name;
         if (is_callable($this->$name)) {
-            $value = call_user_func($value, $this->dataSet);
+            $value = call_user_func($value, $this);
         } else {
             $value = $this->resolveValue($value, $canBeCached);
             if ($canBeCached) {
@@ -186,7 +128,10 @@ abstract class AbstractField
      */
     private function resolveValue($value, &$canBeCached = true)
     {
-        if (DataSet::isPath($value) && !empty($this->dataSet)) {
+        if (DataSet::isPath($value)) {
+            if (empty($this->dataSet)) {
+                throw new ConfigurationException('DataSet is required to resole value by path.');
+            }
             if (!DataSet::isAbsolutePath($value)) {
                 $canBeCached = false;
             }

@@ -15,21 +15,7 @@ class Int extends Scalar
     /**
      * @var bool Whether field is signed. If so, value form stream will be casted to signed integer.
      */
-    protected $signed = false;
-
-    /**
-     * Init int signed.
-     *
-     * @param array $options
-     * @return void
-     */
-    public function init(array $options)
-    {
-        parent::init($options);
-        if (isset($options['signed'])) {
-            $this->setSigned($options['signed']);
-        }
-    }
+    protected $signed;
 
     /**
      * Getter for signed property.
@@ -38,7 +24,7 @@ class Int extends Scalar
      */
     public function getSigned()
     {
-        return $this->signed;
+        return (bool) $this->signed;
     }
 
     /**
@@ -59,6 +45,6 @@ class Int extends Scalar
      */
     public function read(AbstractStream $stream)
     {
-        return $stream->getBuffer()->readInt($this->getSize(), $this->signed);
+        return $stream->getBuffer()->readInt($this->getSize(), $this->getSigned());
     }
 }

@@ -75,7 +75,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase
     {
         $dataSet = new DataSet(['exists' => ['key' => 'value']]);
         $dataSet->setValueByPath(['foo'], 'bar');
-        $dataSet->setValueByPath(['exists', 'key'], 'newValue');
+        $dataSet->setValueByPath('/exists/key', 'newValue');
         $this->assertEquals('bar', $dataSet->getValueByPath(['foo']));
         $this->assertEquals('newValue', $dataSet->getValueByPath(['exists', 'key']));
     }

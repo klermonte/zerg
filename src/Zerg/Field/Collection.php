@@ -18,31 +18,26 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     /**
      * @var AbstractField[] List of children fields.
      */
-    private $children = [];
+    protected $fields;
 
-    /**
-     * Init field by array of field declarations.
-     *
-     * @param array $schemaArray Array of declarations.
-     */
-    public function init($schemaArray)
+    public function __construct($schema, $options = [])
     {
-        $this->initFromArray($schemaArray);
+        $this->initFromArray($schema);
+        $this->configure($options);
     }
 
     /**
-     * Add a new child node to children list.
+     * Add a new child node to field list.
      *
      * @param string $name The field name.
      * @param AbstractField $child Field instance.
      */
-    public function addChild($name, AbstractField $child)
+    public function addField($name, AbstractField $child)
     {
-        $child->setParent($this);
-        $this->children[$name] = $child;
+        $this->fields[$name] = $child;
     }
 
-    /**
+    /**Compound
      * Recursively call parse method of all children and store values in associated DataSet.
      *
      * @api
@@ -51,25 +46,25 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function parse(AbstractStream $stream)
     {
-        if ($this->dataSet == null) {
+        if (!($this->dataSet instanceof DataSet)) {
             $this->dataSet = new DataSet;
         }
 
-        foreach ($this->children as $fieldName => $fieldObj) {
-
-            $fieldObj->setDataSet($this->dataSet);
-            $fieldObj->saveToDataSet($fieldName, $stream);
-
+        $this->rewind();
+        while ($this->valid()) {
+            $field = $this->current();
+            $field->setDataSet($this->getDataSet());
+            if ($field instanceof self) {
+                $this->dataSet->push($this->key());
+                $field->parse($stream);
+                $this->dataSet->pop();
+            } else {
+                $this->dataSet->setValue($this->key(), $field->parse($stream));
+            }
+            $this->next();
         }
 
-        return $this->dataSet;
-    }
-
-    protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
-    {
-        $this->dataSet->push($fieldName);
-        $this->parse($stream);
-        $this->dataSet->pop();
+        return $this->dataSet->getData();
     }
 
     /**
@@ -81,18 +76,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
     private function initFromArray(array $fieldArray = [])
     {
         foreach ($fieldArray as $fieldName => $fieldParams) {
-
-            if (!is_array($fieldParams)) {
-                throw new ConfigurationException('Unknown element declaration');
-            }
-
-            $isAssoc = array_keys(array_keys($fieldParams)) !== array_keys($fieldParams);
-
-            if ($isAssoc || is_array(reset($fieldParams))) {
-                $fieldParams = ['collection', $fieldParams];
-            }
-
-            $this->addChild($fieldName, Factory::get($fieldParams));
+            $this->addField($fieldName, Factory::get($fieldParams));
         }
     }
 
@@ -101,7 +85,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function offsetExists($offset)
     {
-        return isset($this->children[$offset]);
+        return isset($this->fields[$offset]);
     }
 
     /**
@@ -109,7 +93,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function offsetGet($offset)
     {
-        return $this->children[$offset];
+        return $this->fields[$offset];
     }
 
     /**
@@ -117,7 +101,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function offsetSet($offset, $value)
     {
-        $this->children[$offset] = $value;
+        $this->fields[$offset] = $value;
     }
 
     /**
@@ -125,15 +109,16 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function offsetUnset($offset)
     {
-        unset($this->children[$offset]);
+        unset($this->fields[$offset]);
     }
 
     /**
      * @inheritdoc
+     * @return AbstractField
      */
     public function current()
     {
-        return current($this->children);
+        return current($this->fields);
     }
 
     /**
@@ -141,7 +126,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function next()
     {
-        next($this->children);
+        next($this->fields);
     }
 
     /**
@@ -149,7 +134,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function key()
     {
-        return key($this->children);
+        return key($this->fields);
     }
 
     /**
@@ -157,7 +142,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function valid()
     {
-        return isset($this->children[$this->key()]);
+        return isset($this->fields[$this->key()]);
     }
 
     /**
@@ -165,6 +150,6 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
      */
     public function rewind()
     {
-        reset($this->children);
+        reset($this->fields);
     }
 }

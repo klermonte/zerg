@@ -60,95 +60,88 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
             'c' => [
                 'd' => ['int', 8, ['signed' => true]]
             ],
-            'e' => ['string', 10, ['count' => 16]],
-            'f' => ['collection', [
-                'fa' => ['int', 8],
-                'fc' => [
-                    ['int', 8],
-                    ['int', 8]
-                ],
-                'fb' => ['string', 10, ['utf' => true]]
-            ], ['count' => 5]]
+            'e' => ['arr', 16, ['string', 10]],
+            'f' => ['arr', 5, [
+                'collection', [
+                    'fa' => ['int', 8],
+                    'fc' => [
+                        ['int', 8],
+                        ['int', 8]
+                    ],
+                    'fb' => ['string', 10, ['assert' => 'qweqweqweq']]
+                ]
+            ]]
         ]);
 
         $this->assertInstanceOf('\\Zerg\\Field\\Int', $collection['a']);
         $this->assertInstanceOf('\\Zerg\\Field\\String', $collection['b']);
         $this->assertInstanceOf('\\Zerg\\Field\\Int', $collection['c']['d']);
         $this->assertInstanceOf('\\Zerg\\Field\\Collection', $collection['c']);
-        $this->assertInstanceOf('\\Zerg\\Field\\Collection', $collection['c']->getParent());
-        $this->assertSame($collection, $collection['c']->getParent());
         $this->assertEquals(16, $collection['e']->getCount());
-        $this->assertInstanceOf('\\Zerg\\Field\\Collection', $collection['f']);
-        $this->assertSame($collection['f']->getParent(), $collection['c']->getParent());
+        $this->assertInstanceOf('\\Zerg\\Field\\Arr', $collection['f']);
         $this->assertEquals(5, $collection['f']->getCount());
-        $this->assertInstanceOf('\\Zerg\\Field\\Collection', $collection['f']['fc']);
-        $this->assertSame($collection['f'], $collection['f']['fc']->getParent());
     }
 
     public function testParse()
     {
         $collection = new Collection([
             'a' => ['int', 'byte'],
-            'b' => ['conditional', '/a', [
-                'fields' => [
-                    0 => ['int', 8],
-                    49 => ['conditional', '/a', [
-                        'fields' => [
+            'b' => ['conditional', '/a',
+                [
+                    0  => ['int', 8],
+                    49 => ['conditional', '/a',
+                        [
                             49 => ['string', 6]
                         ]
-                    ]]
+                    ]
                 ],
-                'default' => [
-                    ['int', 8],
-                    ['int', 8]
+                [
+                    'default' => [
+                        ['int', 8],
+                        ['int', 8]
+                    ]
                 ]
-            ]],
+            ],
             'c' => [
-                'd' => ['int', 8, ['signed' => true]],
+                'd'  => ['int', 8, ['signed' => true]],
                 'd2' => ['int', 8, ['signed' => true]],
             ],
-            'e' => ['arr', 16, ['field' => ['string', 80]]],
+            'e' => ['arr', 16, ['string', 80]],
             'f' => [
-                'arr', '/a', [
-                    'countCallback' => function ($count) {
-                        return $count - 45;
-                    },
-                    'field' => [
-                        'fa' => ['arr', 5, ['field' => ['string', 16]]],
-                        'fc' => [
-                            'qwe1' => ['int', 8],
-                            'qwe2' => ['int', 8],
-                            'qwe3' => [
-                                ['string', 16],
-                                ['string', 16],
-                            ]
-                        ],
-                        'fb' => ['string', 16, ['utf' => true]]
-                    ]
+                'arr',
+                function (Arr $arrayField) {
+                    $value = $arrayField
+                        ->getDataSet()
+                        ->getValueByPath('/a') - 45;
+                    return $value;
+                },
+                [
+                    'fa' => ['arr', 5, ['field' => ['string', 16]]],
+                    'fc' => [
+                        'qwe1' => ['int', 8],
+                        'qwe2' => ['int', 8],
+                        'qwe3' => [
+                            ['string', 16],
+                            ['string', 16],
+                        ]
+                    ],
+                    'fb' => ['string', 16]
                 ]
             ],
         ]);
 
-        $stream = new StringStream('1sadfasdfhf3qurht3094h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfad
-        adfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf
-        890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r1111
-        11111ysahf890yasf9sdasdfasdfasdfafadfasdfasdfafadfasfadadfasdf4h02r111111111ysahf
-        890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r1111
-        11111ysahf890yasf9sdasdfasdfasdfafadfasdfasdfafadfasfadadfasdf4h02r111111111ysahf
-        890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r1111
-        11111ysahf890yasf9sdasdfasdfasdfafadfasfadadfasdf4h02r111111111ysahf890yasf9sdasdfasdf
-        asdfafadfasfadadfasdfgdbfgasda');
+        $stream = new StringStream(str_pad('', 1000, '1'));
 
         $dataSet = $collection->parse($stream);
 
-        $this->assertInternalType('int', $dataSet->getData()['a']);
-        $this->assertInternalType('string', $dataSet->getData()['b']);
-        $this->assertCount(16, $dataSet->getData()['e']);
-        $this->assertCount(4, $dataSet->getData()['f']);
-        $this->assertCount(5, $dataSet->getData()['f'][2]['fa']);
-        $this->assertCount(3, $dataSet->getData()['f'][3]['fc']);
-        $this->assertCount(2, $dataSet->getData()['f'][3]['fc']['qwe3']);
-        $this->assertEquals(2, strlen($dataSet->getData()['f'][3]['fc']['qwe3'][1]));
+        $this->assertInternalType('int', $dataSet['a']);
+        $this->assertInternalType('string', $dataSet['b']);
+        $this->assertCount(16, $dataSet['e']);
+        $this->assertCount(4, $dataSet['f']);
+        $this->assertCount(5, $dataSet['f'][2]['fa']);
+        $this->assertCount(3, $dataSet['f'][3]['fc']);
+        $this->assertCount(2, $dataSet['f'][3]['fc']['qwe3']);
+        $this->assertEquals(2, strlen($dataSet['f'][3]['fc']['qwe3'][1]));
     }
 
     /**
@@ -156,7 +149,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      * */
     public function testCreationException()
     {
-        $collection = new Collection(['foo']);
+        new Collection(['foo']);
     }
 
     /**
@@ -164,6 +157,6 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreationError()
     {
-        $collection = new Collection('foo');
+        new Collection('foo');
     }
 }

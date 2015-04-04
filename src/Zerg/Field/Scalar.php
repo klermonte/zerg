@@ -17,6 +17,9 @@ use Zerg\Stream\AbstractStream;
  */
 abstract class Scalar extends AbstractField
 {
+    const ENDIAN_BIG = 1;
+    const ENDIAN_LITTLE = 2;
+
     /**
      * @var int|string|callable Size of field in bits/bytes, path to value in DataSet or callback.
      */
@@ -26,6 +29,11 @@ abstract class Scalar extends AbstractField
      * @var callable Callback that changes value of the field.
      */
     protected $formatter;
+
+    /**
+     * @var int Field endian.
+     */
+    protected $endian;
 
     /**
      * @var array Human names of some common used sizes.
@@ -51,21 +59,11 @@ abstract class Scalar extends AbstractField
      */
     abstract public function read(AbstractStream $stream);
 
-    /**
-     * Init field size
-     *
-     * @param array $options
-     * @return void
-     * @throws ConfigurationException If size option does not present.
-     */
-    public function init(array $options)
+
+    public function __construct($size, $options = [])
     {
-        parent::init($options);
-        if (isset($options['size'])) {
-            $this->setSize($options['size']);
-        } else {
-            throw new ConfigurationException('Scalar field must be configured by size');
-        }
+        $this->setSize($size);
+        $this->configure($options);
     }
 
     /**
@@ -98,7 +96,7 @@ abstract class Scalar extends AbstractField
      */
     public function setSize($size)
     {
-        if ($parsed = $this->parseSizeWord($size)) {
+        if (is_string($size) && $parsed = $this->parseSizeWord($size)) {
             $this->size = $parsed;
         } else {
             $this->size = $size;
@@ -124,6 +122,22 @@ abstract class Scalar extends AbstractField
     public function setFormatter($formatter)
     {
         $this->formatter = $formatter;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEndian()
+    {
+        return $this->endian;
+    }
+
+    /**
+     * @param mixed $endian
+     */
+    public function setEndian($endian)
+    {
+        $this->endian = $endian;
     }
 
     /**

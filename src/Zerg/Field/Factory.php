@@ -13,19 +13,35 @@ class Factory
     /**
      * Create field instance by its declaration.
      *
-     * @param array $elementParams Field declaration.
+     * @param array $declaration Field declaration.
      * @return AbstractField Field instance.
      * @throws ConfigurationException If invalid declaration is presented.
      */
-    public static function get(array $elementParams = [])
+    private static function instantiate(array $declaration)
     {
-        $elementType = array_shift($elementParams);
+        $fieldType = array_shift($declaration);
 
-        $class = "\\Zerg\\Field\\" . ucfirst(strtolower($elementType));
+        $class = "\\Zerg\\Field\\" . ucfirst(strtolower($fieldType));
         if (class_exists($class)) {
-            return new $class(array_shift($elementParams), array_shift($elementParams));
+            $reflection = new \ReflectionClass($class);
+            return $reflection->newInstanceArgs($declaration);
         }
 
-        throw new ConfigurationException("Field {$elementType} doesn't exist");
+        throw new ConfigurationException("Field {$fieldType} doesn't exist");
+    }
+
+    public static function get($array)
+    {
+        if (!is_array($array)) {
+            throw new ConfigurationException('Unknown element declaration');
+        }
+
+        $isAssoc = array_keys(array_keys($array)) !== array_keys($array);
+
+        if ($isAssoc || is_array(reset($array))) {
+            $array = ['collection', $array];
+        }
+
+        return Factory::instantiate($array);
     }
 }

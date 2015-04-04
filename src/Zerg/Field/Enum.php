@@ -15,12 +15,18 @@ class Enum extends Int
     /**
      * @var array Array of possible values. Keys should by integer.
      */
-    protected $values = [];
+    protected $values;
 
     /**
      * @var mixed Default value, if no one of possible values are not relate to read value.
      */
-    protected $default = null;
+    protected $default;
+
+    public function __construct($size, array $values, $options = [])
+    {
+        parent::__construct($size, $options);
+        $this->setValues($values);
+    }
 
     /**
      * Read key from Stream, and return value by this key or default value.
@@ -32,12 +38,12 @@ class Enum extends Int
     public function read(AbstractStream $stream)
     {
         $key = parent::read($stream);
-        $values = !empty($this->values) ? (array) $this->values : [];
+        $values = $this->getValues();
 
         if (array_key_exists($key, $values)) {
             $value = $values[$key];
         } else {
-            $value = $this->default;
+            $value = $this->getDefault();
         }
 
         if ($value === null) {
@@ -48,5 +54,37 @@ class Enum extends Int
         }
 
         return $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * @param array $values
+     */
+    public function setValues($values)
+    {
+        $this->values = $values;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefault()
+    {
+        return $this->default;
+    }
+
+    /**
+     * @param mixed $default
+     */
+    public function setDefault($default)
+    {
+        $this->default = $default;
     }
 }
