@@ -9,11 +9,11 @@ class PaddingTest extends \PHPUnit_Framework_TestCase
     public function sizes()
     {
         return [
-            [4,4,4,0xa],
+            [4,4,4,0xD],
             [4,2,2,3],
             [8,8,8,0xf4],
             [4,12,8,0xf4],
-            [8,12,4,0xf],
+            [8,12,4,0x4],
         ];
     }
 

@@ -2,7 +2,7 @@
 
 namespace Zerg\Stream;
 
-use PhpBinaryReader\BinaryReader;
+use PhpBio\BitBuffer;
 
 /**
  * FileStream wraps file and allow fields to read data from it.
@@ -20,6 +20,6 @@ class FileStream extends AbstractStream
     public function __construct($path)
     {
         $handle = fopen($path, 'rb');
-        $this->reader = new BinaryReader($handle);
+        $this->buffer = new BitBuffer($handle);
     }
 }

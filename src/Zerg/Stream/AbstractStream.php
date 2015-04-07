@@ -12,27 +12,26 @@ namespace Zerg\Stream;
 abstract class AbstractStream
 {
     /**
-     * @var \PhpBinaryReader\BinaryReader Object that reads data from file|memory stream.
+     * @var \PhpBio\BitBuffer Object that reads and writes data from|to file|memory stream.
      * */
-    protected $reader;
+    protected $buffer;
 
     /**
-     * Implementations should init reader itself by given value.
+     * Implementations should init buffer itself by given value.
      *
-     * @param string $path Value to init reader.
+     * @param string $path Value to init buffer.
      */
     abstract public function __construct($path);
 
     /**
-     * Getter for $reader property.
+     * Getter for $buffer property.
      *
-     * @return \PhpBinaryReader\BinaryReader Object that reads data from file|memory stream.
+     * @return \PhpBio\BitBuffer Object that reads data from file|memory stream.
      */
-    public function getReader()
+    public function getBuffer()
     {
-        return $this->reader;
+        return $this->buffer;
     }
-
 
     /**
      * Move internal pointer by given amount of bits ahead without reading dta.
@@ -41,19 +40,6 @@ abstract class AbstractStream
      */
     public function skip($size)
     {
-        $newBits = $size % 8;
-        if (!$this->reader->getCurrentBit() && !$newBits) {
-            $this->reader->setPosition($this->reader->getPosition() + $size / 8);
-        } else {
-            $this->reader->readUBits($size);
-        }
-    }
-
-    /**
-     * Release resources on object destruction.
-     */
-    public function __destruct()
-    {
-        fclose($this->reader->getInputHandle());
+        $this->buffer->setPosition($this->buffer->getPosition() + $size);
     }
 }

@@ -7,26 +7,26 @@ use Zerg\Stream\StringStream;
 
 class ConditionalTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Conditional
+     */
     public $field;
     public $stream;
 
     public function setUp()
     {
         $this->field = new Conditional('/c/d', [
-            'fields' => [
                 1 => [
                     'wqe' => ['int', 8],
-                    'asd' => ['string', 2]
+                    'asd' => ['string', 16]
                 ],
                 5 => ['int', 8],
                 10 => ['conditional', '/a', [
-                    'fields' => [
-                        1 => ['string', 6]
-                    ]
+                    1 => ['string', 48]
                 ]]
             ],
-            'default' => ['int', 8]
-        ]);
+            ['default' => ['int', 8]]
+        );
 
         $this->field->setDataSet(new DataSet([
             'a' => 1,
@@ -49,21 +49,20 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $value = $field->parse($stream);
         $this->assertSame(49, $value);
 
-        $field->configure(['key' => '/a']);
+        $field->setKey('/a');
         $value = $field->parse($stream);
-        $this->assertInstanceOf('\\Zerg\\DataSet', $value);
         $this->assertSame(50, $value['wqe']);
         $this->assertSame('3a', $value['asd']);
 
-        $field->configure(['key' => '/b']);
+        $field->setKey('/b');
         $value = $field->parse($stream);
         $this->assertSame(ord('b'), $value);
 
-        $field->configure(['key' => '/c/e']);
+        $field->setKey('/c/e');
         $value = $field->parse($stream);
         $this->assertSame('cdefgh', $value);
 
-        $field->configure(['key' => '/c/f']);
+        $field->setKey('/c/f');
         $value = $field->parse($stream);
         $this->assertSame(ord('i'), $value);
     }
@@ -73,7 +72,8 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
      * */
     public function testKeyException()
     {
-        $this->field->configure(['key' => '/a/y', 'default' => null]);
+        $this->field->setKey('/a/y');
+        $this->field->setDefault(null);
         $this->field->parse($this->stream);
     }
 }

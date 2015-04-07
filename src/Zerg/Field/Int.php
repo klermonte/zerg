@@ -15,7 +15,7 @@ class Int extends Scalar
     /**
      * @var bool Whether field is signed. If so, value form stream will be casted to signed integer.
      */
-    protected $signed = false;
+    protected $signed;
 
     /**
      * Getter for signed property.
@@ -24,7 +24,7 @@ class Int extends Scalar
      */
     public function getSigned()
     {
-        return $this->signed;
+        return (bool) $this->signed;
     }
 
     /**
@@ -42,32 +42,9 @@ class Int extends Scalar
      *
      * @param AbstractStream $stream Stream from which read.
      * @return int Result value.
-     * @throws ConfigurationException if unsupported size is resolved.
      */
     public function read(AbstractStream $stream)
     {
-        $size = $this->getSize();
-
-        $methodName = 'read' . ($this->signed ? '' : 'U') . 'Int';
-
-        switch ($size) {
-            case 8:
-            case 16:
-            case 32:
-                $methodName .= $size;
-                $value = $stream->getReader()->$methodName();
-                break;
-
-            default:
-                if ($size <= 32) {
-                    $value = $this->signed
-                        ? $stream->getReader()->readBits($size)
-                        : $stream->getReader()->readUBits($size);
-                } else {
-                    throw new ConfigurationException('Int can not be larger 32 bits');
-                }
-        }
-
-        return $value;
+        return $stream->getBuffer()->readInt($this->getSize(), $this->getSigned());
     }
 }

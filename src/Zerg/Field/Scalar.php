@@ -10,27 +10,30 @@ use Zerg\Stream\AbstractStream;
  * This is an abstract class, so it should be extended by implementation classes.
  * Scalar field should have size {@see $size} which can be overridden by size callback {@see $sizeCallback}
  * and may have count {@see AbstractField::$size}. Also scalar return value can be overridden
- * by value callback {@see $valueCallback}
+ * by formatter {@see $formatter}
  *
  * @since 0.1
  * @package Zerg\Field
  */
 abstract class Scalar extends AbstractField
 {
+    const ENDIAN_BIG = 1;
+    const ENDIAN_LITTLE = 2;
+
     /**
-     * @var int|string Size of field in bits/bytes or path to value in DataSet.
+     * @var int|string|callable Size of field in bits/bytes, path to value in DataSet or callback.
      */
     protected $size;
 
     /**
-     * @var callable Callback that changes size of the field.
-     */
-    protected $sizeCallback;
-
-    /**
      * @var callable Callback that changes value of the field.
      */
-    protected $valueCallback;
+    protected $formatter;
+
+    /**
+     * @var int Field endian.
+     */
+    protected $endian;
 
     /**
      * @var array Human names of some common used sizes.
@@ -56,30 +59,27 @@ abstract class Scalar extends AbstractField
      */
     abstract public function read(AbstractStream $stream);
 
-    /**
-     * Init field by it's size.
-     *
-     * @param int|string $size Size in bits/bytes or DataSet path.
-     */
-    public function init($size)
+
+    public function __construct($size, $options = [])
     {
         $this->setSize($size);
+        $this->configure($options);
     }
 
     /**
      * Return final value of size.
      *
-     * If size was set as DataSet path, it will be processed here.
+     * If size was set as DataSet path or callback, it will be processed here.
      *
      * @return int Final value of size.
      * @throws ConfigurationException If the value was less than zero.
      */
     public function getSize()
     {
-        $size = (int) $this->getCallbackableProperty('size', $this->resolveProperty('size'));
+        $size = (int) $this->resolveProperty('size');
 
         if ($size < 0) {
-            throw new ConfigurationException('Element size should not be less 0');
+            throw new ConfigurationException('Field size should not be less 0');
         }
 
         return $size;
@@ -96,7 +96,7 @@ abstract class Scalar extends AbstractField
      */
     public function setSize($size)
     {
-        if ($parsed = $this->parseSizeWord($size)) {
+        if (is_string($size) && $parsed = $this->parseSizeWord($size)) {
             $this->size = $parsed;
         } else {
             $this->size = $size;
@@ -109,19 +109,35 @@ abstract class Scalar extends AbstractField
      *
      * @return callable
      */
-    public function getValueCallback()
+    public function getFormatter()
     {
-        return $this->valueCallback;
+        return $this->formatter;
     }
 
     /**
      * Setter for the value callback.
      *
-     * @param callable $valueCallback
+     * @param callable $formatter
      */
-    public function setValueCallback($valueCallback)
+    public function setFormatter($formatter)
     {
-        $this->valueCallback = $valueCallback;
+        $this->formatter = $formatter;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEndian()
+    {
+        return $this->endian;
+    }
+
+    /**
+     * @param mixed $endian
+     */
+    public function setEndian($endian)
+    {
+        $this->endian = $endian;
     }
 
     /**
@@ -144,8 +160,8 @@ abstract class Scalar extends AbstractField
      */
     private function format($value)
     {
-        if (is_callable($this->valueCallback)) {
-            $value = call_user_func($this->valueCallback, $value);
+        if (is_callable($this->formatter)) {
+            $value = call_user_func($this->formatter, $value, $this->dataSet);
         }
         return $value;
     }

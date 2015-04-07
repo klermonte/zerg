@@ -7,7 +7,7 @@ use Zerg\Stream\AbstractStream;
 
 /**
  * This abstract class represents any type of field - an entity that takes, processes and
- * returns some data from Stream. Any field can be repeated given times. Also field has access
+ * returns some data from Stream. Also field has access
  * to DataSet from which it takes config values by given paths.
  *
  * @since 0.1
@@ -16,51 +16,19 @@ use Zerg\Stream\AbstractStream;
 abstract class AbstractField
 {
     /**
-     * @var Collection The collection field that holds this field.
-     */
-    protected $parent = null;
-
-    /**
      * @var DataSet The DataSet from which this field take values by path.
      */
-    protected $dataSet = null;
+    protected $dataSet;
 
     /**
-     * @var string|int Number of times that field should be repeated.
+     * @var mixed Value to compare parse result.
      */
-    protected $count = 1;
+    protected $assert;
 
     /**
-     * @var callable Callback that changes field repeat count.
+     * @var array Cache to found values.
      */
-    protected $countCallback;
-
-    /**
-     * Initialize field instance.
-     *
-     * Avery field has one main parameter, which it itself sets by init() {@see init()}
-     * method. Others config values sets smarty by configure() {@see configure()} method.
-     *
-     * @param int|string|array $mainParam This parameter processed by class implementation.
-     * @param array $properties Array of class properties to be set.
-     */
-    public function __construct($mainParam, $properties = [])
-    {
-        if (empty($properties)) {
-            $properties = [];
-        }
-        $this->init($mainParam);
-        $this->configure($properties);
-    }
-
-    /**
-     * Implementation classes should override this method to init itself
-     * by given main parameter.
-     *
-     * @param int|string|array $mainParam This parameter processed by class implementation.
-     * @return void
-     */
-    abstract public function init($mainParam);
+    private $propertyCache = [];
 
     /**
      * Read and process data from Stream.
@@ -71,85 +39,14 @@ abstract class AbstractField
      */
     abstract public function parse(AbstractStream $stream);
 
-    /**
-     * Init class properties by given values.
-     *
-     * @param array $properties Array of class properties to be set.
-     * @return static For chaining.
-     */
-    public function configure(array $properties = [])
+    public function configure(array $properties)
     {
         foreach ($properties as $name => $value) {
-            $setter = 'set' . $name;
-            if (method_exists($this, $setter)) {
-                $this->$setter($value);
-            } else {
-                $this->$name = $value;
+            $methodName = 'set' . ucfirst(strtolower($name));
+            if (method_exists($this, $methodName) && $this->$name === null) {
+                $this->$methodName($value);
             }
         }
-        return $this;
-    }
-
-    /**
-     * Return parent collection.
-     *
-     * @return Collection Collection instance holding this field.
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * Set parent collection.
-     *
-     * @param Collection $parent Collection instance, than will be hold this field.
-     * @return static For chaining.
-     */
-    public function setParent(Collection $parent)
-    {
-        $this->parent = $parent;
-        return $this;
-    }
-
-    /**
-     * Return field repeat count.
-     *
-     * @return int|array Number of times that this field should be repeated.
-     * Or array of numbers for multidimensional repeats.
-     * @throws ConfigurationException If one of processed values is less zero.
-     */
-    public function getCount()
-    {
-        $count = $this->getCallbackableProperty('count', $this->resolveProperty('count'));
-
-        if (!is_array($count)) {
-            $count = [$count];
-        }
-
-        foreach ($count as $key => $subCount) {
-            $count[$key] = (int) $subCount;
-            if ($count[$key] < 0) {
-                throw new ConfigurationException('Field count should not be less 0');
-            }
-        }
-
-        return count($count) > 1 ? $count : reset($count);
-    }
-
-    /**
-     * Set field repeat count.
-     *
-     * Size can be represented as a string containing on of size key words {@see $sizes}.
-     * Also you can set path to already parsed value in DataSet.
-     *
-     * @param string|int $count
-     * @return static For chaining.
-     */
-    public function setCount($count)
-    {
-        $this->count = $count;
-        return $this;
     }
 
     /**
@@ -174,45 +71,22 @@ abstract class AbstractField
         return $this;
     }
 
-    protected function saveToDataSet($fieldName, AbstractStream $stream)
+    /**
+     * @return mixed
+     */
+    public function getAssert()
     {
-        $count = $this->getCount();
-
-        if (empty($count) || $count == 1) {
-            $this->saveToDataSetOnce($fieldName, $stream);
-        } else {
-            $this->saveToDataSetByCount($fieldName, $stream, $count);
-        }
+        return $this->assert;
     }
 
-    protected function saveToDataSetByCount($fieldName, AbstractStream $stream, $count)
+    /**
+     * @param mixed $assert
+     * @return $this
+     */
+    public function setAssert($assert)
     {
-        $this->dataSet->push($fieldName);
-
-        if (!is_array($count)) {
-            $count = [$count];
-        }
-
-        $countPart = array_shift($count);
-
-        for ($i = 0; $i < $countPart; $i++) {
-            if (empty($count)) {
-                $this->saveToDataSetOnce($i, $stream);
-            } else {
-                $this->saveToDataSetByCount($i, $stream, $count);
-            }
-        }
-
-        $this->dataSet->pop();
-
-    }
-
-    protected function saveToDataSetOnce($fieldName, AbstractStream $stream)
-    {
-        $value = $this->parse($stream);
-        if ($value !== null && !($value instanceof DataSet)) {
-            $this->dataSet->setValue($fieldName, $value);
-        }
+        $this->assert = $assert;
+        return $this;
     }
 
     /**
@@ -226,9 +100,18 @@ abstract class AbstractField
      */
     protected function resolveProperty($name)
     {
-        $value = $this->resolveValue($this->$name, $canBeCached);
-        if ($canBeCached) {
-            $this->$name = $value;
+        if (isset($this->propertyCache[$name])) {
+            return $this->propertyCache[$name];
+        }
+
+        $value = $this->$name;
+        if (is_callable($this->$name)) {
+            $value = call_user_func($value, $this);
+        } else {
+            $value = $this->resolveValue($value, $canBeCached);
+            if ($canBeCached) {
+                $this->propertyCache[$name] = $value;
+            }
         }
 
         return $value;
@@ -243,75 +126,22 @@ abstract class AbstractField
      * @return array|int|null|string
      * @since 0.2
      */
-    protected function resolveValue($value, &$canBeCached = true)
+    private function resolveValue($value, &$canBeCached = true)
     {
         if (DataSet::isPath($value)) {
+            if (empty($this->dataSet)) {
+                throw new ConfigurationException('DataSet is required to resole value by path.');
+            }
             if (!DataSet::isAbsolutePath($value)) {
                 $canBeCached = false;
             }
-            $value = $this->resolvePath($value);
+            $value = $this->dataSet->resolvePath($value);
         }
 
         if (is_array($value)) {
             foreach ($value as $key => $subValue) {
-                $value[$key] = $this->resolveValue($subValue, $canBeCachedSubValue);
-                if ($canBeCached && !$canBeCachedSubValue) {
-                    $canBeCached = false;
-                }
+                $value[$key] = $this->resolveValue($subValue, $canBeCached);
             }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Process value by callback.
-     *
-     * Callback should be set by the property of the same name with 'Callback'
-     * suffix on the end ('countCallback' for instance). If callback is not set
-     * property value will be returned.
-     *
-     * @param string $name Property name.
-     * @param mixed $currentValue
-     * @return mixed Processed or already set property value.
-     */
-    protected function getCallbackableProperty($name, $currentValue = null)
-    {
-        $callbackName = strtolower($name) . 'Callback';
-
-        if ($currentValue !== null) {
-            $values = $currentValue;
-        } else {
-            $values = $this->$name;
-        }
-
-        if (!is_array($values)) {
-            $values = [$values];
-        }
-        if (is_callable($this->$callbackName)) {
-            foreach ($values as $key => $value) {
-                $values[$key] = call_user_func($this->$callbackName, $value);
-            }
-        }
-        return count($values) > 1 ? $values : reset($values);
-    }
-
-    /**
-     * Find value by given path in associated DataSet.
-     *
-     * @param string $value Value path.
-     * @return array|int|null|string
-     * @throws ConfigurationException If there is not DataSet while property is set as path string.
-     * @since 0.2
-     */
-    protected function resolvePath($value)
-    {
-        if ($this->dataSet !== null) {
-            do {
-                $value = $this->dataSet->getValueByPath($this->dataSet->parsePath($value));
-            } while (DataSet::isPath($value));
-        } else {
-            throw new ConfigurationException('DataSet required to get value by path');
         }
 
         return $value;

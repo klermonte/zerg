@@ -30,7 +30,7 @@ class IntTest extends \PHPUnit_Framework_TestCase
     {
         $stream = new StringStream("\x73\xda\xf4\xdc\0");
         $int = new Int('nibble');
-        $values = [3,7,10,13,4,15];
+        $values = [7, 3, 13, 10, 15, 4];
         foreach ($values as $expected) {
             $this->assertSame($expected, $int->read($stream));
         }
@@ -38,9 +38,9 @@ class IntTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0xdc, (new Int('byte'))->read($stream));
 
         $int->setSize('semi_nibble');
-        $stream->getReader()->setPosition(0)->setCurrentBit(0);
+        $stream->getBuffer()->setPosition(0);
 
-        $values = [3,0,3,1,2,2,1,3,0,1,3,3];
+        $values = [1,3,0,3,3,1,2,2,3,3,1,0];
         foreach ($values as $expected) {
             $this->assertSame($expected, $int->read($stream));
         }
@@ -54,7 +54,7 @@ class IntTest extends \PHPUnit_Framework_TestCase
         $int = new Int('nibble');
         $newStream = new StringStream("\x31");
         $int->read($newStream);
-        $this->assertSame(3, $int->read($newStream));
+        $this->assertSame(1, $int->read($newStream));
         $int->read($newStream);
     }
 
@@ -65,26 +65,16 @@ class IntTest extends \PHPUnit_Framework_TestCase
     public function testInvalidOptionSize($invalidValue)
     {
         $int = new Int($invalidValue);
-        $seze = $int->getSize();
+        $int->getSize();
     }
 
 
     /**
-     * @expectedException \Zerg\Field\ConfigurationException
-     * @dataProvider invalidValues
-     * */
-    public function testInvalidOptionCount($invalidValue)
-    {
-        $int = new Int('byte', ['count' => $invalidValue]);
-        $count = $int->getCount();
-    }
-
-    /**
-     * @expectedException \Zerg\Field\ConfigurationException
+     * @expectedException \LengthException
      * */
     public function testLargeIntException()
     {
-        $int = new Int(64);
+        $int = new Int(65);
         $int->read(new StringStream('foo'));
     }
 

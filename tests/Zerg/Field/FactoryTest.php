@@ -7,12 +7,14 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function types()
     {
         return [
-            [['int', 1],         '\\Zerg\\Field\Int'],
-            [['string', 1],      '\\Zerg\\Field\String'],
-            [['enum', 1],        '\\Zerg\\Field\Enum'],
-            [['conditional', 1], '\\Zerg\\Field\conditional'],
-            [['padding', 1],     '\\Zerg\\Field\padding'],
-            [['collection', []], '\\Zerg\\Field\collection'],
+            [['int', 1],                                '\\Zerg\\Field\Int'],
+            [['int', 1, ['signed' => true]],            '\\Zerg\\Field\Int'],
+            [['string', 1, ['assert' => 'qwe']],        '\\Zerg\\Field\String'],
+            [['enum', 1, [], ['default' => 1]],         '\\Zerg\\Field\Enum'],
+            [['conditional', 1, [], ['default' => []]], '\\Zerg\\Field\conditional'],
+            [['padding', 1],                            '\\Zerg\\Field\padding'],
+            [['collection', []],                        '\\Zerg\\Field\collection'],
+            [['arr', 10, ['int', 1]],                   '\\Zerg\\Field\Arr'],
         ];
     }
 
@@ -30,6 +32,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * */
     public function testCreationException()
     {
-        $field = Factory::get(['foo']);
+        Factory::get(['foo']);
     }
 }
