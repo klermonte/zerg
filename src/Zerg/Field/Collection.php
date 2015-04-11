@@ -37,12 +37,12 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
         $this->fields[$name] = $child;
     }
 
-    /**Compound
+    /**
      * Recursively call parse method of all children and store values in associated DataSet.
      *
      * @api
      * @param AbstractStream $stream Stream from which children read.
-     * @return DataSet DataSet instance filled by children fields values.
+     * @return array Array of parsed values.
      */
     public function parse(AbstractStream $stream)
     {
@@ -51,7 +51,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
         }
 
         $this->rewind();
-        while ($this->valid()) {
+        do {
             $field = $this->current();
             $field->setDataSet($this->getDataSet());
             if ($field instanceof self) {
@@ -62,7 +62,7 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
                 $this->dataSet->setValue($this->key(), $field->parse($stream));
             }
             $this->next();
-        }
+        } while ($this->valid());
 
         if (isset($this->assert)) {
             $this->validate($this->dataSet->getValueByCurrentPath());

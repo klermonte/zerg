@@ -2,7 +2,17 @@
 
 namespace Zerg\Field;
 
+use Zerg\Stream\AbstractStream;
 
+/**
+ * Class Arr repeat given field needed times.
+ *
+ * This field return array of values, that are read from Stream by given field,
+ * specified count of times, or until some condition are performed.
+ *
+ * @since 1.0
+ * @package Zerg\Field
+ */
 class Arr extends Collection
 {
     /**
@@ -31,6 +41,27 @@ class Arr extends Collection
         $this->setField($field);
         $this->index = 0;
         $this->configure($options);
+    }
+
+    /**
+     * Call parse method on arrayed field needed times.
+     *
+     * @api
+     * @param AbstractStream $stream Stream from which children read.
+     * @return array Array of parsed values.
+     * @since 1.0
+     */
+    public function parse(AbstractStream $stream)
+    {
+        try {
+            return parent::parse($stream);
+        } catch (\OutOfBoundsException $e) {
+            if ($this->isUntilEof()) {
+                return $this->dataSet->getData();
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -124,7 +155,10 @@ class Arr extends Collection
      */
     public function valid()
     {
-        return $this->index < $this->getCount();
+        if (is_callable($this->getUntil())) {
+            return call_user_func($this->getUntil(), end($this->getDataSet()->getValueByCurrentPath()));
+        }
+        return $this->index < $this->getCount() || $this->isUntilEof();
     }
 
     /**
@@ -133,5 +167,16 @@ class Arr extends Collection
     public function rewind()
     {
         $this->index = 0;
+    }
+
+    /**
+     * Whether array must read until end of file.
+     *
+     * @return bool
+     */
+    private function isUntilEof()
+    {
+        $until = $this->getUntil();
+        return is_string($until) && strtolower($until) === 'eof';
     }
 }
