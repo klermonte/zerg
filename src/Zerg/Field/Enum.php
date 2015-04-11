@@ -22,10 +22,12 @@ class Enum extends Int
      */
     protected $default;
 
-    public function __construct($size, array $values, $options = [])
+    public function __construct($size, array $values = [], $options = [])
     {
         parent::__construct($size, $options);
-        $this->setValues($values);
+        if (!empty($values)) {
+            $this->setValues($values);
+        }
     }
 
     /**

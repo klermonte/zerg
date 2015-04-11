@@ -127,4 +127,16 @@ class IntTest extends \PHPUnit_Framework_TestCase
         $field = new Int('byte', ['endian' => 'little']);
     }
 
+    public function testMassConfig()
+    {
+        $int1 = new Int(32, ['assert' => 10, 'signed' => true, 'endian' => Endian::ENDIAN_BIG]);
+        $int2 = new Int([
+            'size' => 32,
+            'assert' => 10,
+            'signed' => true,
+            'endian' => Endian::ENDIAN_BIG
+        ]);
+        $this->assertEquals($int1, $int2);
+    }
+
 } 

@@ -50,4 +50,14 @@ class ArrTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('1', $data[0]);
         $this->assertEquals('2', $data[1]);
     }
+
+    public function testMassConfig()
+    {
+        $conditional1 = new Arr(null, ['int', 8], ['until' => 'eof']);
+        $conditional2 = new Arr([
+            'field' => ['int', 8],
+            'until' => 'eof',
+        ]);
+        $this->assertEquals($conditional1, $conditional2);
+    }
 }

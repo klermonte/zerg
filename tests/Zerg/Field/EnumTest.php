@@ -57,4 +57,16 @@ class EnumTest extends \PHPUnit_Framework_TestCase
         ], ['assert' => 'wrong']))->parse(new StringStream('1'));
     }
 
+    public function testMassConfig()
+    {
+        $enum1 = new Enum(32, [1, 2], ['assert' => 10, 'signed' => true]);
+        $enum2 = new Enum([
+            'size' => 32,
+            'values' => [1, 2],
+            'assert' => 10,
+            'signed' => true
+        ]);
+        $this->assertEquals($enum1, $enum2);
+    }
+
 }

@@ -7,14 +7,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function types()
     {
         return [
-            [['int', 1],                                '\\Zerg\\Field\Int'],
-            [['int', 1, ['signed' => true]],            '\\Zerg\\Field\Int'],
-            [['string', 1, ['assert' => 'qwe']],        '\\Zerg\\Field\String'],
-            [['enum', 1, [], ['default' => 1]],         '\\Zerg\\Field\Enum'],
-            [['conditional', 1, [], ['default' => []]], '\\Zerg\\Field\conditional'],
-            [['padding', 1],                            '\\Zerg\\Field\padding'],
-            [['collection', []],                        '\\Zerg\\Field\collection'],
-            [['arr', 10, ['int', 1]],                   '\\Zerg\\Field\Arr'],
+            [['int', 1],                                      '\\Zerg\\Field\Int'],
+            [['int', 1, ['signed' => true]],                  '\\Zerg\\Field\Int'],
+            [['string', 1, ['assert' => 'qwe']],              '\\Zerg\\Field\String'],
+            [['enum', 1, [], ['default' => 1]],               '\\Zerg\\Field\Enum'],
+            [['conditional', 1, [], ['default' => []]],       '\\Zerg\\Field\conditional'],
+            [['padding', 1],                                  '\\Zerg\\Field\padding'],
+            [['collection', []],                              '\\Zerg\\Field\collection'],
+            [['arr', 10, ['int', 1]],                         '\\Zerg\\Field\Arr'],
+            [['arr', ['field' => ['int', 1], 'count' => 10]], '\\Zerg\\Field\Arr'],
         ];
     }
 

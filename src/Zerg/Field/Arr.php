@@ -35,12 +35,16 @@ class Arr extends Collection
      */
     protected $index;
 
-    public function __construct($count, $field, $options = [])
+    public function __construct($count, $field = [], $options = [])
     {
-        $this->setCount($count);
-        $this->setField($field);
         $this->index = 0;
-        $this->configure($options);
+        if (is_array($count)) {
+            $this->configure($count);
+        } else {
+            $this->setCount($count);
+            $this->setField($field);
+            $this->configure($options);
+        }
     }
 
     /**

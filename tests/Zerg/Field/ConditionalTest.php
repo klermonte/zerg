@@ -76,4 +76,17 @@ class ConditionalTest extends \PHPUnit_Framework_TestCase
         $this->field->setDefault(null);
         $this->field->parse($this->stream);
     }
+
+    public function testMassConfig()
+    {
+        $conditional1 = new Conditional('/some/path', [['int', 8], ['int', 8]], ['assert' => 10, 'default' => ['int', 8]]);
+        $conditional2 = new Conditional([
+            'key' => '/some/path',
+            'fields' => [['int', 8], ['int', 8]],
+            'assert' => 10,
+            'default' => ['int', 8],
+            'signed' => true
+        ]);
+        $this->assertEquals($conditional1, $conditional2);
+    }
 }

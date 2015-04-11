@@ -64,8 +64,12 @@ abstract class Scalar extends AbstractField
 
     public function __construct($size, $options = [])
     {
-        $this->setSize($size);
-        $this->configure($options);
+        if (is_array($size)) {
+            $this->configure($size);
+        } else {
+            $this->setSize($size);
+            $this->configure($options);
+        }
     }
 
     /**
@@ -168,7 +172,7 @@ abstract class Scalar extends AbstractField
     }
 
     /**
-     * Applies all value hooks to read value.
+     * Applies value formatter to read value.
      *
      * @param int|string|null $value Read value.
      * @return mixed Processed value.

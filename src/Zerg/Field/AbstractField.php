@@ -39,11 +39,16 @@ abstract class AbstractField
      */
     abstract public function parse(AbstractStream $stream);
 
+    /**
+     * Associate given values to appropriate class properties.
+     *
+     * @param array $properties Associative array of properties values.
+     */
     public function configure(array $properties)
     {
         foreach ($properties as $name => $value) {
             $methodName = 'set' . ucfirst(strtolower($name));
-            if (method_exists($this, $methodName) && $this->$name === null) {
+            if (method_exists($this, $methodName)) {
                 $this->$methodName($value);
             }
         }

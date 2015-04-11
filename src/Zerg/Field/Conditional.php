@@ -27,11 +27,15 @@ class Conditional extends AbstractField
      */
     protected $default;
 
-    public function __construct($key, array $fields, $options = [])
+    public function __construct($key, array $fields = [], $options = [])
     {
-        $this->setKey($key);
-        $this->setFields($fields);
-        $this->configure($options);
+        if (is_array($key)) {
+            $this->configure($key);
+        } else {
+            $this->setKey($key);
+            $this->setFields($fields);
+            $this->configure($options);
+        }
     }
 
     /**
