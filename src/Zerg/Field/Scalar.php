@@ -149,7 +149,9 @@ abstract class Scalar extends AbstractField
      */
     public function parse(AbstractStream $stream)
     {
-        return $this->format($this->read($stream));
+        $value = $this->format($this->read($stream));
+        $this->validate($value);
+        return $value;
     }
 
     /**

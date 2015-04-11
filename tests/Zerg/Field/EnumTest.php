@@ -36,4 +36,25 @@ class EnumTest extends \PHPUnit_Framework_TestCase
 
         $field->read($stream);
     }
+
+    public function testAssertion()
+    {
+        $field = new Enum(8, [
+            49 => 'right',
+            32 => 'wrong',
+        ], ['assert' => 'right']);
+        $this->assertTrue($field->validate($field->read(new StringStream('1'))));
+    }
+
+    /**
+     * @expectedException \Zerg\Field\AssertException
+     * */
+    public function testAssertionException()
+    {
+        (new Enum(8, [
+            49 => 'right',
+            32 => 'wrong',
+        ], ['assert' => 'wrong']))->parse(new StringStream('1'));
+    }
+
 }

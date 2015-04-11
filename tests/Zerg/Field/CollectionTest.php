@@ -85,7 +85,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     public function testParse()
     {
         $collection = new Collection([
-            'a' => ['int', 'byte'],
+            'a' => ['int', 'byte', ['assert' => 49]],
             'b' => ['conditional', '/a',
                 [
                     0  => ['int', 8],
@@ -103,8 +103,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'c' => [
-                'd'  => ['int', 8, ['signed' => true]],
-                'd2' => ['int', 8, ['signed' => true]],
+                'collection',
+                [
+                    'd'  => ['int', 8, ['signed' => true]],
+                    'd2' => ['int', 8, ['signed' => true]],
+                ],
+                [
+                    'assert' => [
+                        'd' => 76,
+                        'd2' => 76
+                    ]
+                ]
             ],
             'e' => ['arr', 16, ['string', 80]],
             'f' => [
@@ -125,7 +134,9 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
                             ['string', 16],
                         ]
                     ],
-                    'fb' => ['string', 16]
+                    'fb' => ['string', 16, ['assert' => function ($readString) {
+                        return $readString === 'LL';
+                    }]]
                 ]
             ],
         ]);

@@ -241,6 +241,26 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
+     * Return current internal read|write position.
+     *
+     * @return array
+     */
+    public function getCurrentPath()
+    {
+        return $this->currentPath;
+    }
+
+    /**
+     * Return value, stored in DataSet by current internal read|write position.
+     *
+     * @return array|int|null|string
+     */
+    public function getValueByCurrentPath()
+    {
+        return $this->getValueByPath($this->getCurrentPath());
+    }
+
+    /**
      * @inheritdoc
      * */
     public function current()

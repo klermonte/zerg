@@ -64,6 +64,10 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
             $this->next();
         }
 
+        if (isset($this->assert)) {
+            $this->validate($this->dataSet->getValueByCurrentPath());
+        }
+
         return $this->dataSet->getData();
     }
 

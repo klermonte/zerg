@@ -28,7 +28,7 @@ abstract class AbstractField
     /**
      * @var array Cache to found values.
      */
-    private $propertyCache = [];
+    protected $propertyCache = [];
 
     /**
      * Read and process data from Stream.
@@ -87,6 +87,41 @@ abstract class AbstractField
     {
         $this->assert = $assert;
         return $this;
+    }
+
+    /**
+     * Check that given value is valid.
+     *
+     * @param $value mixed Checked value.
+     * @return true On success validation.
+     * @throws AssertException On assertion fail.
+     */
+    public function validate($value)
+    {
+        $assert = $this->getAssert();
+        if ($assert !== null) {
+            if (is_callable($assert)) {
+                if (!call_user_func($assert, $value, $this)) {
+                    throw new AssertException(
+                        sprintf('Custom validation fail with value (%s) "%s"', gettype($value), print_r($value, true))
+                    );
+                }
+            } else {
+                if ($value !== $assert) {
+                    throw new AssertException(
+                        sprintf(
+                            'Failed asserting that actual value (%s) "%s" matches expected value (%s) "%s".',
+                            gettype($value),
+                            print_r($value, true),
+                            gettype($assert),
+                            print_r($assert, true)
+                        )
+                    );
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

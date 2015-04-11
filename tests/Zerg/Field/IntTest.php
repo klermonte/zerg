@@ -85,4 +85,29 @@ class IntTest extends \PHPUnit_Framework_TestCase
             ['/foo/bar']
         ];
     }
+
+    public function testAssertion()
+    {
+        $int = new Int(8, ['assert' => 49]);
+        $this->assertTrue($int->validate(49));
+    }
+
+    /**
+     * @expectedException \Zerg\Field\AssertException
+     * */
+    public function testAssertionException()
+    {
+        (new Int(8, ['assert' => 50]))->parse(new StringStream('1'));
+    }
+
+    /**
+     * @expectedException \Zerg\Field\AssertException
+     * */
+    public function testCallbackAssertionException()
+    {
+        (new Int(8, ['assert' => function ($val, Int $field) {
+            return $val !== 49;
+        }]))->parse(new StringStream('1'));
+    }
+
 } 

@@ -48,7 +48,9 @@ class Conditional extends AbstractField
             $field = $field->resolve();
         } while ($field instanceof self);
 
-        return $field->parse($stream);
+        $value = $field->parse($stream);
+        $this->validate($value);
+        return $value;
     }
 
     /**
