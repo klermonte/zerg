@@ -213,18 +213,6 @@ class DataSet implements \ArrayAccess, \Iterator
     }
 
     /**
-     * Determines whether a given string is a DataSet absolute path.
-     *
-     * @param mixed $value Tested string.
-     * @return bool Whether tested string is a DataSet absolute path.
-     * @since 0.2
-     */
-    public static function isAbsolutePath($value)
-    {
-        return self::isPath($value) && strpos($value, '.') !== 0;
-    }
-
-    /**
      * Recursively find value by path.
      *
      * @param string $value Value path.

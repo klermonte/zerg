@@ -135,21 +135,12 @@ abstract class AbstractField
      */
     protected function resolveProperty($name)
     {
-        if (isset($this->propertyCache[$name])) {
-            return $this->propertyCache[$name];
-        }
-
         $value = $this->$name;
-        if (is_callable($this->$name)) {
-            $value = call_user_func($value, $this);
-        } else {
-            $value = $this->resolveValue($value, $canBeCached);
-            if ($canBeCached) {
-                $this->propertyCache[$name] = $value;
-            }
+        if (is_callable($value)) {
+            return call_user_func($value, $this);
         }
 
-        return $value;
+        return $this->resolveValue($value);
     }
 
     /**
@@ -157,25 +148,21 @@ abstract class AbstractField
      * Otherwise given value will be returned.
      *
      * @param $value
-     * @param $canBeCached
      * @return array|int|null|string
      * @since 0.2
      */
-    private function resolveValue($value, &$canBeCached = true)
+    private function resolveValue($value)
     {
         if (DataSet::isPath($value)) {
             if (empty($this->dataSet)) {
                 throw new ConfigurationException('DataSet is required to resole value by path.');
-            }
-            if (!DataSet::isAbsolutePath($value)) {
-                $canBeCached = false;
             }
             $value = $this->dataSet->resolvePath($value);
         }
 
         if (is_array($value)) {
             foreach ($value as $key => $subValue) {
-                $value[$key] = $this->resolveValue($subValue, $canBeCached);
+                $value[$key] = $this->resolveValue($subValue);
             }
         }
 
