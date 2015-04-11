@@ -156,7 +156,8 @@ class Arr extends Collection
     public function valid()
     {
         if (is_callable($this->getUntil())) {
-            return call_user_func($this->getUntil(), end($this->getDataSet()->getValueByCurrentPath()));
+            $value = $this->getDataSet()->getValueByCurrentPath();
+            return call_user_func($this->getUntil(), end($value));
         }
         return $this->index < $this->getCount() || $this->isUntilEof();
     }
