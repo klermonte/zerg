@@ -2,6 +2,7 @@
 
 namespace Zerg\Field;
 
+use PhpBio\Endian;
 use Zerg\Stream\AbstractStream;
 
 /**
@@ -32,6 +33,7 @@ abstract class Scalar extends AbstractField
 
     /**
      * @var int Field endian.
+     * @since 1.0
      */
     protected $endian;
 
@@ -118,14 +120,17 @@ abstract class Scalar extends AbstractField
      * Setter for the value callback.
      *
      * @param callable $formatter
+     * @return $this
      */
     public function setFormatter($formatter)
     {
         $this->formatter = $formatter;
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return int
+     * @since 1.0
      */
     public function getEndian()
     {
@@ -133,11 +138,19 @@ abstract class Scalar extends AbstractField
     }
 
     /**
-     * @param mixed $endian
+     * @param int $endian
+     * @since 1.0
+     * @return $this
      */
     public function setEndian($endian)
     {
+        if (!in_array($endian, [Endian::ENDIAN_BIG, Endian::ENDIAN_LITTLE])) {
+            throw new ConfigurationException(
+                sprintf('Endian must be %d for Big endian of %d for Little', Endian::ENDIAN_BIG, Endian::ENDIAN_LITTLE)
+            );
+        }
         $this->endian = $endian;
+        return $this;
     }
 
     /**

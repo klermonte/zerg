@@ -2,6 +2,7 @@
 
 namespace Zerg\Field;
 
+use PhpBio\Endian;
 use Zerg\Stream\StringStream;
 
 class IntTest extends \PHPUnit_Framework_TestCase
@@ -108,6 +109,22 @@ class IntTest extends \PHPUnit_Framework_TestCase
         (new Int(8, ['assert' => function ($val, Int $field) {
             return $val !== 49;
         }]))->parse(new StringStream('1'));
+    }
+
+    public function testEndian()
+    {
+        $field = new Int('byte', ['endian' => Endian::ENDIAN_BIG]);
+        $this->assertEquals(Endian::ENDIAN_BIG, $field->getEndian());
+        $this->assertEquals(Endian::ENDIAN_LITTLE, $field->setEndian(Endian::ENDIAN_LITTLE)->getEndian());
+    }
+
+
+    /**
+     * @expectedException \Zerg\Field\ConfigurationException
+     * */
+    public function testEndianException()
+    {
+        $field = new Int('byte', ['endian' => 'little']);
     }
 
 } 

@@ -45,6 +45,6 @@ class Int extends Scalar
      */
     public function read(AbstractStream $stream)
     {
-        return $stream->getBuffer()->readInt($this->getSize(), $this->getSigned());
+        return $stream->getBuffer()->readInt($this->getSize(), $this->getSigned(), $this->getEndian());
     }
 }

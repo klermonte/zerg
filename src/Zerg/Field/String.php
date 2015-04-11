@@ -22,6 +22,6 @@ class String extends Scalar
      */
     public function read(AbstractStream $stream)
     {
-        return $stream->getBuffer()->read($this->getSize());
+        return $stream->getBuffer()->read($this->getSize(), $this->getEndian());
     }
 }
