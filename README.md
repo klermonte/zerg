@@ -15,25 +15,21 @@ Or add `"klermonte/zerg": "dev-master"` to your dependancy list in composer.json
 // Describe your binary format in zerg language
 $fieldCollection = new \Zerg\Field\Collection([
     'stringValue' => ['string', 15],
-     'intValue' => ['int', 8, [
-        'count' => 5
-    ]],
+    'intValue' => ['arr', 5, ['int', 8]],
     'enumValue' => ['enum', 8, [
-        'values' => [
             0 => 'zero',
             10 => 'ten',
             32 => 'many'
-        ],
-        'default' => 'not found'
-    ]]
+        ], ['default' => 'not found']
+    ]
 ]);
 
 // Wrap your data in one of zerg streams
-$sourceStream = new \Zerg\Stream\StringStream("Hello from zerg123");
+$sourceStream = new \Zerg\Stream\StringStream("Hello from zerg123456");
 
 //Get your data structure
-$dataSet = $fieldCollection->parse($sourceStream); // return \Zerg\DataSet instanse
-print_r($dataSet->getData());
+$data  = $fieldCollection->parse($sourceStream);
+print_r($data);
 /*
 Array
 (
@@ -50,43 +46,170 @@ Array
     [enumValue] => not found
 )
 */
-
-// or just one field
-$intValue = $dataSet['intValue'];
 ```
 
-## Field declaration
-All zerg fields are described by array of 2 or 3 elements:
-
-Element index | Function | Type | Value examples
-------------- | -------- | ---- | ---------------
-0 | Field type | string | `'int', 'string', 'enum', 'padding', 'conditional', 'collection'`
-1 | Field init paramert | string or int | `'word'` or `32` for size, `'/header/packageSize'` for back link
-3 | Field properties | array | `['signed' => true]`, `['values' => [1 => 'one', 10 => 'ten']]`
-
 ## Field types
-Type key | Init parameter | Description |Field properties
----------|----------------|-------------| ----
-int      | Size in bits   | Inteder (signed or not) | **signed** (optional, bool, default false) - whether field value is signed or not
-string   | Size in bytes  | String (utf of not) | **utf** (optional, bool, default false) - if set true, addition BOM checks will be processed
-padding  | Size in bits   | Amount of bits that should be skipped and not saved | none
-enum     | Size in bits   | Enumirable values | **values** (required, array) - array of values form which field choose return value by read key, **default** (optional, mixed, default null) - value that will be chosen if none of the values does not find
-conditional | key | Field that transforms to other field depends by back link value | **fields** (required, array) - array of field declarations form which conditional choose needed by key parameter, **default** (optional, array, default null) - field declaration that will be chosen if none of the values does not find
+### Integer
+```php
+// Object notation
+// --------------------------------------
+// $field = new Int(<size>, <options>);
 
-Also, any type of field can be reapeated several times using  `'count'` field property. So you get array of values instead one value.
+$field = new Int(4);
+$field = new Int('byte', [
+    'signed' => true, 
+    'formatter' => function($value) {
+        return $value * 100;
+    }
+]);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['int', <size>, <options>];
+```
+Avaliable options  
+
+Option name | Avaliable values | Description
+------------|-------------|-------------
+signed      | `boolean`, default `false` | Whether field value is signed or not
+endian      | `PhpBio\Endian::ENDIAN_BIG` or<br>`PhpBio\Endian::ENDIAN_LITTLE` | Endianess of field
+formatter   | `callable` | callback, that take 2 arguments:<br>`function ($parsedValue, $dataSetInstance) {...}`
+
+### String
+```php
+// Object notation
+// --------------------------------------
+// $field = new String(<size>, <options>);
+
+$field = new String(16);
+$field = new String('short', [
+    'endian' => PhpBio\Endian::ENDIAN_BIG, 
+    'formatter' => function($value) {
+        return str_repeat($value, 2);
+    }
+]);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['string', <size>, <options>];
+```
+Avaliable options  
+
+Option name | Avaliable values | Description
+------------|-------------|-------------
+endian      | `PhpBio\Endian::ENDIAN_BIG` or<br>`PhpBio\Endian::ENDIAN_LITTLE` | Endianess of field
+formatter   | `callable` | callback, that take 2 arguments:<br>`function ($parsedValue, DataSet $dataSet) {...}`
+
+### Padding
+```php
+// Object notation
+// --------------------------------------
+// $field = new Padding(<size>);
+
+$field = new Padding(16);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['padding', <size>];
+```
+
+### Enum
+```php
+// Object notation
+// --------------------------------------
+// $field = new Enum(<size>, <values>, <options>);
+
+$field = new Enum(8, [0, 1, 2, 3]);
+$field = new Enum('short', [
+        1234 => 'qwerty1',
+        2345 => 'qwerty2'
+    ], [
+        'default' => 'abcdef'
+    ]
+);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['enum', <values>, <options>];
+```
+Avaliable options  
+
+Option name | Avaliable values | Description
+------------|-------------|-------------
+default     | `mixed`, optional | Value, that will be returned, if no one key from `values` matchs to parsed value
+
+And all options from **Integer** field type.
+
+### Conditional
+```php
+// Object notation
+// --------------------------------------
+// $field = new Conditional(<key>, <fields>, <options>);
+
+$field = new Conditional('/path/to/key/value', [
+        1 => ['int', 32],
+        2 => ['string', 32]
+    ], [
+        'default' => ['padding', 32]
+    ]
+);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['conditional', <fields>, <options>];
+```
+Avaliable options  
+
+Option name | Avaliable values | Description
+------------|-------------|-------------
+default     | `array`, optional | Field in array notation, that will be used, if no one key from `field` matchs to parsed value
+
+### Array
+```php
+// Object notation
+// --------------------------------------
+// $field = new Arr(<count>, <field>, <options>);
+
+$field = new Arr(10, ['int', 32]);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['arr', <field>, <options>];
+```
+Avaliable options  
+
+Option name | Avaliable values | Description
+------------|-------------|-------------
+until       | `'eof'` or `callable` | If set, array field count parameter will be ignored, and field will parse values until End of File or callback return false, callback take one argument:<br>`function ($lastParsedValue) {...}`
+
+### Collection
+```php
+// Object notation
+// --------------------------------------
+// $field = new Collection(<fields>, <options>);
+
+$field = new Collection([
+    'firstValue' => ['int', 32],
+    'secondValue' => ['string', 32]
+]);
+
+// Array notation
+// --------------------------------------
+// $fieldArray = ['collection', <fields>, <options>];
+// or just
+// $fieldArray = <fields>;
+```
 
 ### Back links
-Size, count and conditional key parameters may be declared as a back link - path to already parsed value. Path should starts with `/` sign, that means root of data set.
+Size, count and conditional key parameters may be declared as a back link - path to already parsed value. Path can starts with `/` sign, that means root of data set or with '../' for relative path.
 ```php
 $fieldCollection = new \Zerg\Field\Collection([
     'count' => ['string', 2],
-    'intValue' => ['int', 8, [
-        'count' => '/count'
-    ]]
+    'intValue' => ['arr', '/count', ['int', 8]]
 ]);
 $sourceStream = new \Zerg\Stream\StringStream("101234567890");
-$dataSet = $fieldCollection->parse($sourceStream);
-print_r($dataSet->getData());
+$data = $fieldCollection->parse($sourceStream);
+print_r($data);
 /*
 Array
 (
@@ -112,16 +235,17 @@ Array
 $fieldCollection = new \Zerg\Field\Collection([
     'count' => ['string', 2],
     'conditional' => ['conditional', '/count', [
-        'fields' => [
-            0 => ['string', 10],
+            0 => ['string', 80],
             10 => ['int', 16]
         ],
-        'default' => ['string', 2]
-    ]]
+        [
+            'default' => ['string', 2]
+        ]
+    ]
 ]);
 $sourceStream = new \Zerg\Stream\StringStream("101234567890");
-$dataSet = $fieldCollection->parse($sourceStream);
-print_r($dataSet->getData());
+$data = $fieldCollection->parse($sourceStream);
+print_r($data);
 /*
 Array
 (
