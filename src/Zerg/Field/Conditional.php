@@ -47,14 +47,9 @@ class Conditional extends AbstractField
      */
     public function parse(AbstractStream $stream)
     {
-        $field = $this;
-        do {
-            $field = $field->resolve();
-        } while ($field instanceof self);
+        $field = $this->resolveField();
 
-        $value = $field->parse($stream);
-        $this->validate($value);
-        return $value;
+        return $field->parse($stream);
     }
 
     /**
@@ -64,6 +59,16 @@ class Conditional extends AbstractField
      * @throws InvalidKeyException If no one declaration is not related to resolved value and
      * default declaration is not presented.
      */
+    public function resolveField()
+    {
+        $field = $this;
+        do {
+            $field = $field->resolve();
+        } while ($field instanceof self);
+
+        return $field;
+    }
+
     private function resolve()
     {
         $key = $this->resolveProperty('key');

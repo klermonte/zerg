@@ -54,6 +54,9 @@ class Collection extends AbstractField implements \ArrayAccess, \Iterator
         do {
             $field = $this->current();
             $field->setDataSet($this->getDataSet());
+            if ($field instanceof Conditional) {
+                $field = $field->resolveField();
+            }
             if ($field instanceof self) {
                 $this->dataSet->push($this->key());
                 $field->parse($stream);
